@@ -29,7 +29,7 @@ public class SecurityConfig {
 						auth -> auth.requestMatchers("/actuator/**").permitAll()
 								.requestMatchers("/api/pg-properties").permitAll()
 								.requestMatchers("/api/pg-properties/").permitAll()
-								.requestMatchers("/api/pg-properties/*").permitAll()
+								.requestMatchers("/api/pg-properties/**").permitAll()
 								.anyRequest().authenticated())
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();

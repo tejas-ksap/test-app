@@ -21,7 +21,7 @@ const TenantDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <Link
-            to="/tenant/available-pgs"
+            to="/"
             className="group relative bg-blue-50 dark:bg-slate-800/50 border border-blue-100 dark:border-blue-900/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden block"
           >
             <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">

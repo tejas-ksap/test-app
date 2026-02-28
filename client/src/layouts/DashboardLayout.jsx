@@ -24,7 +24,6 @@ const NAV_LINKS = {
   ],
   TENANT: [
     { path: "/tenant/dashboard", icon: "📊", label: "Dashboard" },
-    { path: "/tenant/available-pgs", icon: "🏠", label: "Available PGs" },
     { path: "/tenant/my-bookings", icon: "📑", label: "My Bookings" },
   ],
 };

@@ -12,8 +12,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // In this design, username and email are used interchangeably
-  // We'll update the label to "Email address" but keep tracking it as username
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -68,7 +66,7 @@ const Login = () => {
 
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-700" htmlFor="username">
-            Email address
+            Username
           </label>
           <input
             id="username"
@@ -78,7 +76,7 @@ const Login = () => {
             value={formData.username}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
-            placeholder="name@company.com"
+            placeholder="johndoe"
           />
         </div>
 

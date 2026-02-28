@@ -284,24 +284,6 @@ const PgDetails = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Guests</label>
-                  <div className="flex items-center justify-between px-5 py-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
-                    <button
-                      onClick={() => setBookingData({ ...bookingData, guests: Math.max(1, bookingData.guests - 1) })}
-                      className="w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-gray-600 shadow-sm hover:shadow-md transition active:scale-90"
-                    >
-                      <span className="material-icons-outlined text-xl">remove</span>
-                    </button>
-                    <span className="font-bold text-gray-900 dark:text-white text-lg">{bookingData.guests} Guest{bookingData.guests > 1 ? 's' : ''}</span>
-                    <button
-                      onClick={() => setBookingData({ ...bookingData, guests: bookingData.guests + 1 })}
-                      className="w-10 h-10 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center text-gray-600 shadow-sm hover:shadow-md transition active:scale-90"
-                    >
-                      <span className="material-icons-outlined text-xl">add</span>
-                    </button>
-                  </div>
-                </div>
               </div>
 
               <button
