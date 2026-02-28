@@ -1,0 +1,77 @@
+package com.pgaccommodation.pgpropertyservice.controller;
+
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pgaccommodation.pgpropertyservice.entity.PgProperty;
+import com.pgaccommodation.pgpropertyservice.service.PgPropertyService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/pg-properties")
+@RequiredArgsConstructor
+public class PgPropertyController {
+
+	private final PgPropertyService pgPropertyService;
+
+	// Only OWNERs can add PG properties
+	@PreAuthorize("hasRole('OWNER')")
+	@PostMapping
+	public ResponseEntity<PgProperty> addPgProperty(@Valid @RequestBody PgProperty pgProperty) {
+		return ResponseEntity.ok(pgPropertyService.addPgProperty(pgProperty));
+	}
+
+	// Allow everyone (including unauthenticated users) to view all PG properties
+	@GetMapping
+	public ResponseEntity<List<PgProperty>> getAllPgProperties() {
+		return ResponseEntity.ok(pgPropertyService.getAllPgProperties());
+	}
+
+	// Anyone can search PGs by city
+	@GetMapping("/city/{city}")
+	public ResponseEntity<List<PgProperty>> getPgByCity(@PathVariable("city") String city) {
+		return ResponseEntity.ok(pgPropertyService.getPgPropertiesByCity(city));
+	}
+
+	// Anyone can view a single PG
+	@GetMapping("/{id}")
+	public ResponseEntity<PgProperty> getPgById(@PathVariable("id") Integer id) {
+		return pgPropertyService.getPgPropertyById(id).map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	// Only OWNERs or ADMINs can delete PG
+	@PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletePg(@PathVariable("id") Integer id) {
+		pgPropertyService.deletePgProperty(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/owner/{ownerId}")
+	public ResponseEntity<List<PgProperty>> getPgsByOwnerId(@PathVariable Integer ownerId) {
+		List<PgProperty> pgs = pgPropertyService.getPgPropertiesByOwnerId(ownerId);
+		return ResponseEntity.ok(pgs);
+	}
+
+	// Only OWNERs or ADMINs can update PG
+	@PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
+	@PutMapping("/{id}")
+	public ResponseEntity<PgProperty> updatePgProperty(@PathVariable Integer id,
+			@Valid @RequestBody PgProperty pgProperty) {
+		return ResponseEntity.ok(pgPropertyService.updatePgProperty(id, pgProperty));
+	}
+
+}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PG Accommodations - Premium Housing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4F46E5", // Indigo-600
+                        "primary-hover": "#4338CA", // Indigo-700
+                        "background-light": "#F9FAFB", // Gray-50
+                        "background-dark": "#0F172A", // Slate-900
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B", // Slate-800
+                        "text-main-light": "#1E293B", // Slate-800
+                        "text-main-dark": "#F8FAFC", // Slate-50
+                        "text-sub-light": "#64748B", // Slate-500
+                        "text-sub-dark": "#94A3B8", // Slate-400
+                    },
+                    fontFamily: {
+                        display: ["Montserrat", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        xl: "0.75rem",
+                        "2xl": "1rem",
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                    }
+                },
+            },
+        };
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-300 min-h-screen flex flex-col">
+<nav class="bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16">
+<div class="flex items-center">
+<div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+<span class="material-icons-round text-primary text-3xl">apartment</span>
+<span class="font-display font-bold text-xl tracking-tight text-text-main-light dark:text-white">PG Accommodations</span>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<a class="text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary font-medium text-sm transition-colors" href="#">Login</a>
+<a class="bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-full text-sm font-medium shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5" href="#">Register</a>
+<button class="p-2 text-text-sub-light dark:text-text-sub-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-round text-xl">brightness_4</span>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="flex-grow">
+<div class="relative bg-background-light dark:bg-background-dark pt-16 pb-12 sm:pt-24 sm:pb-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+<h1 class="text-4xl sm:text-5xl font-extrabold text-text-main-light dark:text-white tracking-tight mb-4">
+                Find Your Perfect <span class="text-primary">PG Accommodation</span>
+</h1>
+<p class="text-lg text-text-sub-light dark:text-text-sub-dark max-w-2xl mb-10">
+                Discover safe, verified, and premium paying guest accommodations tailored for students and professionals.
+            </p>
+<div class="w-full max-w-2xl relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 rounded-full border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-text-main-light dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent shadow-card transition-all" placeholder="Search by city, locality, or landmark..." type="text"/>
+<button class="absolute right-2 top-2 bottom-2 bg-primary hover:bg-primary-hover text-white px-6 rounded-full font-medium transition-colors">
+                    Search
+                </button>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col group h-full">
+<div class="relative h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+<img alt="Modern room interior" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiA9xa9kDP097ExvxmfAduyuG_1FNT4QmGF-iId_75Em7gCkwzyb1Hx5HavD57rLeXN8E131lEvSfxDz-Bpil3_UrB_06Lov2k1zceS7wxiUW-YbiogV9TXnniBcOroLHPsY_Vtezl1rh_DbjT3vZ8DYa85QDF8BLor2_blRqIUIBlvCZOYiqOOxPz2x4QM3dlCGAvIwevt-C52ff0BUIRZoPb34oqd-6h801K2mSsss5HM-P7Yl98DsWca4K5G0BgBvCrb1zYS95R"/>
+<div class="absolute top-4 right-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-sm">
+<span class="material-icons-round text-sm">verified</span> Verified
+                        </div>
+<div class="absolute bottom-4 left-4 bg-white/90 dark:bg-black/70 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-semibold text-text-main-light dark:text-white shadow-sm">
+                            Male Only
+                        </div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-text-main-light dark:text-white group-hover:text-primary transition-colors">Sai PG for Boys</h3>
+<div class="flex items-center gap-1 text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded text-sm font-semibold">
+<span class="material-icons-round text-base">star</span> 4.5
+                            </div>
+</div>
+<p class="text-primary font-bold text-lg mb-4">₹5,000<span class="text-sm text-text-sub-light dark:text-text-sub-dark font-normal">/bed</span></p>
+<div class="text-sm text-text-sub-light dark:text-text-sub-dark space-y-2 mb-6">
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-gray-400 text-lg mt-0.5">location_on</span>
+<span class="line-clamp-2">Plot 12, Near IT Park, Pune (Landmark: Near Infosys)</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-gray-400 text-lg mt-0.5">info</span>
+<span class="line-clamp-2">Spacious rooms with ventilation and 24x7 water supply.</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-6 mt-auto">
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">wifi</span> Free WiFi
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark opacity-50">
+<span class="material-icons-round text-gray-400 text-base">ac_unit</span> No AC
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">restaurant</span> Food Incl.
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark opacity-50">
+<span class="material-icons-round text-gray-400 text-base">local_laundry_service</span> No Laundry
+                            </div>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mb-4 text-sm text-text-sub-light dark:text-text-sub-dark">
+<div>Rooms: <span class="font-semibold text-text-main-light dark:text-white">4</span></div>
+<div>Deposit: <span class="font-semibold text-text-main-light dark:text-white">₹9,000</span></div>
+</div>
+<button class="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95">
+                            Book Now
+                        </button>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col group h-full">
+<div class="relative h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+<img alt="Luxurious studio apartment" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgAq5VmmFV2d5WeKpNh7WztM0AgV0UMOk83e43JzxnSwGesparTlZgv_iDpl_AHuqLdeRcaERnH31crIpj2bcEdwa0GwlMYGUK11e10LRRJqgc19jbWR-7HlH7xsKM1ggdd77dy_VpMs0troX5oLW5JWNVmJ4HQp3XPugo8ynEW8A7io9YmXyhZkAPYigx8RYowcdkZFnAYnlLxk8DO2Aeh_9FQ_g_Oz9Xhro1qhc8HwqE5zf2cPjk8PCcxlu42yS4NJMc4XMM-PBd"/>
+<div class="absolute top-4 right-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-sm">
+<span class="material-icons-round text-sm">verified</span> Verified
+                        </div>
+<div class="absolute bottom-4 left-4 bg-white/90 dark:bg-black/70 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-semibold text-text-main-light dark:text-white shadow-sm">
+                            Unisex
+                        </div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-text-main-light dark:text-white group-hover:text-primary transition-colors">Elite PG for Professionals</h3>
+<div class="flex items-center gap-1 text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded text-sm font-semibold">
+<span class="material-icons-round text-base">star</span> 4.8
+                            </div>
+</div>
+<p class="text-primary font-bold text-lg mb-4">₹7,500<span class="text-sm text-text-sub-light dark:text-text-sub-dark font-normal">/bed</span></p>
+<div class="text-sm text-text-sub-light dark:text-text-sub-dark space-y-2 mb-6">
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-gray-400 text-lg mt-0.5">location_on</span>
+<span class="line-clamp-2">Building No. 45, Sector 12, Bangalore (Landmark: Near Tech Park)</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-gray-400 text-lg mt-0.5">info</span>
+<span class="line-clamp-2">Fully furnished PG with WiFi, laundry and AC rooms. Ideal for working professionals.</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-6 mt-auto">
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">wifi</span> High-Speed WiFi
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">ac_unit</span> Air Conditioned
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">restaurant</span> Food Incl.
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">local_laundry_service</span> Laundry Service
+                            </div>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mb-4 text-sm text-text-sub-light dark:text-text-sub-dark">
+<div>Rooms: <span class="font-semibold text-text-main-light dark:text-white">8</span></div>
+<div>Deposit: <span class="font-semibold text-text-main-light dark:text-white">₹15,000</span></div>
+</div>
+<button class="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95">
+                            Book Now
+                        </button>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft hover:shadow-card transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col group h-full">
+<div class="relative h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+<img alt="Cozy bedroom with soft lighting" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq3SCsfk6VCgh9AB7-DCnI19k4jRcyMqc8eCifIF2_l1g0fX0ZViSR03cI0SDW7wgOZN6Q--gdN9f9fyIpwBbU6wTRMjmk1LAL9vrV6yt790IKeDHuI-EeUcYFL6TbDpO2j5_RgDHXDVN8-WuhSYkOKfaKxeYxMzAknYqAmYW95_VstHV1Mrg5DBwkzi1Dw4aDTykIPN3UA3KA_ssxvbCm2Q-ElXoPv-coowE1pLz4nQwEVYhKm0dchxX37D7oHTw9XzjdIhUw9kHL"/>
+<div class="absolute top-4 right-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-sm">
+<span class="material-icons-round text-sm">verified</span> Verified
+                        </div>
+<div class="absolute bottom-4 left-4 bg-white/90 dark:bg-black/70 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-semibold text-text-main-light dark:text-white shadow-sm">
+                            Female Only
+                        </div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-xl font-bold text-text-main-light dark:text-white group-hover:text-primary transition-colors">Safe Haven Girls PG</h3>
+<div class="flex items-center gap-1 text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded text-sm font-semibold">
+<span class="material-icons-round text-base">star</span> 4.9
+                            </div>
+</div>
+<p class="text-primary font-bold text-lg mb-4">₹8,500<span class="text-sm text-text-sub-light dark:text-text-sub-dark font-normal">/bed</span></p>
+<div class="text-sm text-text-sub-light dark:text-text-sub-dark space-y-2 mb-6">
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-gray-400 text-lg mt-0.5">location_on</span>
+<span class="line-clamp-2">House No. 24, Hauz Khas, Delhi (Landmark: Near Hauz Khas Metro)</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-gray-400 text-lg mt-0.5">info</span>
+<span class="line-clamp-2">Secure and fully managed PG for female working professionals and students.</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-6 mt-auto">
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">wifi</span> Free WiFi
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">ac_unit</span> AC Available
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">restaurant</span> Food Incl.
+                            </div>
+<div class="flex items-center gap-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+<span class="material-icons-round text-green-500 text-base">local_laundry_service</span> Laundry Service
+                            </div>
+</div>
+<div class="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mb-4 text-sm text-text-sub-light dark:text-text-sub-dark">
+<div>Rooms: <span class="font-semibold text-text-main-light dark:text-white">4</span></div>
+<div>Deposit: <span class="font-semibold text-text-main-light dark:text-white">₹17,000</span></div>
+</div>
+<button class="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95">
+                            Book Now
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-center py-8">
+<button class="text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary font-medium flex items-center gap-2 transition-colors">
+                View All Accommodations
+                <span class="material-icons-round">arrow_forward</span>
+</button>
+</div>
+</main>
+<footer class="bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-text-sub-light dark:text-text-sub-dark text-sm">
+            © 2025 PG Accommodations. All rights reserved.
+        </div>
+</footer>
+
+</body></html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tenant Dashboard - PG Accommodations</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2563EB", // Blue-600, consistent with the screenshots
+                        "primary-hover": "#1D4ED8", // Blue-700
+                        "background-light": "#F3F4F6", // Gray-100
+                        "background-dark": "#0F172A", // Slate-900
+                        "card-light": "#FFFFFF",
+                        "card-dark": "#1E293B", // Slate-800
+                        "text-main-light": "#111827", // Gray-900
+                        "text-main-dark": "#F9FAFB", // Gray-50
+                        "text-sub-light": "#6B7280", // Gray-500
+                        "text-sub-dark": "#94A3B8", // Slate-400
+                        "sidebar-dark": "#0F172A", // Darker slate for sidebar
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark transition-colors duration-300">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 bg-sidebar-dark text-gray-300 flex flex-col hidden md:flex border-r border-gray-800 dark:border-gray-700">
+<div class="h-16 flex items-center px-6 border-b border-gray-800 dark:border-gray-700">
+<span class="material-icons-outlined text-primary mr-2">holiday_village</span>
+<span class="text-white font-bold text-lg tracking-wide">PG Finder</span>
+</div>
+<nav class="flex-1 px-3 py-6 space-y-1">
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium bg-primary/10 text-primary rounded-md" href="#">
+<span class="material-icons-outlined mr-3 text-xl">dashboard</span>
+                    Dashboard
+                </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium hover:bg-gray-800 hover:text-white rounded-md transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-xl">search</span>
+                    Available PGs
+                </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium hover:bg-gray-800 hover:text-white rounded-md transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-xl">bookmark_border</span>
+                    My Bookings
+                </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium hover:bg-gray-800 hover:text-white rounded-md transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-xl">payment</span>
+                    Payments
+                </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium hover:bg-gray-800 hover:text-white rounded-md transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-xl">support_agent</span>
+                    Support
+                </a>
+</nav>
+<div class="border-t border-gray-800 p-4">
+<div class="flex items-center w-full justify-between">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-bold">JD</div>
+<div class="ml-3">
+<p class="text-sm font-medium text-white">John Doe</p>
+<p class="text-xs text-gray-500">Tenant</p>
+</div>
+</div>
+<button class="text-gray-400 hover:text-white transition-colors">
+<span class="material-icons-outlined">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<div class="md:hidden bg-card-light dark:bg-card-dark border-b border-gray-200 dark:border-gray-700 h-16 flex items-center justify-between px-4">
+<div class="flex items-center">
+<button class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+<span class="material-icons-outlined text-2xl">menu</span>
+</button>
+<span class="ml-3 font-bold text-lg dark:text-white">PG Finder</span>
+</div>
+<div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-xs">JD</div>
+</div>
+<main class="flex-1 overflow-y-auto p-4 md:p-8">
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+<div>
+<h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Welcome back, John! 👋</h1>
+<p class="mt-2 text-text-sub-light dark:text-text-sub-dark">Here's what's happening with your accommodation today.</p>
+</div>
+<div class="mt-4 sm:mt-0">
+<button class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-outlined text-xl dark:hidden">dark_mode</span>
+<span class="material-icons-outlined text-xl hidden dark:inline">light_mode</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="group relative bg-blue-50 dark:bg-slate-800/50 border border-blue-100 dark:border-blue-900/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-outlined text-8xl text-blue-600">search</span>
+</div>
+<div class="relative z-10">
+<div class="h-12 w-12 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+<span class="material-icons-outlined">search</span>
+</div>
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Find a New PG</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Explore verified accommodations in your preferred city.</p>
+<span class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                Browse Listings <span class="material-icons-outlined text-sm ml-1">arrow_forward</span>
+</span>
+</div>
+</div>
+<div class="group relative bg-green-50 dark:bg-slate-800/50 border border-green-100 dark:border-green-900/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-outlined text-8xl text-green-600">vpn_key</span>
+</div>
+<div class="relative z-10">
+<div class="h-12 w-12 bg-green-100 dark:bg-green-900/50 rounded-lg flex items-center justify-center text-green-600 mb-4">
+<span class="material-icons-outlined">home</span>
+</div>
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Active Stay</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">View details about your current accommodation at Sai PG.</p>
+<span class="inline-flex items-center text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300">
+                                View Details <span class="material-icons-outlined text-sm ml-1">arrow_forward</span>
+</span>
+</div>
+</div>
+<div class="group relative bg-purple-50 dark:bg-slate-800/50 border border-purple-100 dark:border-purple-900/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden">
+<div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-outlined text-8xl text-purple-600">help_outline</span>
+</div>
+<div class="relative z-10">
+<div class="h-12 w-12 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center text-purple-600 mb-4">
+<span class="material-icons-outlined">support_agent</span>
+</div>
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Help &amp; Support</h3>
+<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Raise a complaint or request maintenance for your room.</p>
+<span class="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300">
+                                Contact Support <span class="material-icons-outlined text-sm ml-1">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Payments</h3>
+<button class="text-sm text-primary hover:text-primary-hover font-medium">View All</button>
+</div>
+<div class="divide-y divide-gray-100 dark:divide-gray-700">
+<div class="p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start sm:items-center gap-4">
+<div class="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 shrink-0">
+<span class="material-icons-outlined text-lg">check</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Rent Payment - August</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Paid on Aug 01, 2025</p>
+</div>
+</div>
+<div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">₹7,500</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                            Success
+                                        </span>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-icons-outlined text-lg">download</span>
+</button>
+</div>
+</div>
+<div class="p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start sm:items-center gap-4">
+<div class="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 shrink-0">
+<span class="material-icons-outlined text-lg">check</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Rent Payment - July</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Paid on Jul 02, 2025</p>
+</div>
+</div>
+<div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">₹7,500</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                            Success
+                                        </span>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-icons-outlined text-lg">download</span>
+</button>
+</div>
+</div>
+<div class="p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex items-start sm:items-center gap-4">
+<div class="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 shrink-0">
+<span class="material-icons-outlined text-lg">check</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Security Deposit</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Paid on Jun 15, 2025</p>
+</div>
+</div>
+<div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+<span class="text-sm font-semibold text-gray-900 dark:text-white">₹15,000</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                            Success
+                                        </span>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+<span class="material-icons-outlined text-lg">download</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Room Details</h3>
+<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Room 302</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<div class="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Room Type</p>
+<p class="font-medium text-gray-900 dark:text-white">Single</p>
+</div>
+<div class="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Next Due</p>
+<p class="font-medium text-gray-900 dark:text-white">Sep 01</p>
+</div>
+<div class="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Wifi Code</p>
+<p class="font-medium text-gray-900 dark:text-white">ElitePG_5G</p>
+</div>
+<div class="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Contract End</p>
+<p class="font-medium text-gray-900 dark:text-white">May 2026</p>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-gradient-to-br from-primary to-blue-700 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-white opacity-10 rounded-full blur-xl"></div>
+<h3 class="text-white/80 text-sm font-medium mb-1">Upcoming Rent</h3>
+<div class="flex items-baseline mb-4">
+<span class="text-3xl font-bold">₹7,500</span>
+<span class="ml-2 text-white/70 text-sm">due on Sep 01</span>
+</div>
+<div class="flex items-center justify-between mt-6">
+<span class="text-xs bg-white/20 px-2 py-1 rounded text-white font-medium">Monthly Rent</span>
+<button class="bg-white text-primary text-sm font-semibold px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 transition-colors">
+                                    Pay Now
+                                </button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+<div class="p-5 border-b border-gray-100 dark:border-gray-700">
+<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Requests Status</h3>
+</div>
+<div class="p-5 space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600">
+<span class="material-icons-outlined text-sm">schedule</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">AC Servicing</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Aug 05 - In Progress</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                                        Pending
+                                    </span>
+</div>
+<div class="flex items-center justify-between opacity-60">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
+<span class="material-icons-outlined text-sm">done_all</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Tap Leakage</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Jul 20 - Resolved</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                        Closed
+                                    </span>
+</div>
+<button class="w-full mt-2 py-2 text-sm text-primary font-medium border border-dashed border-primary/30 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors flex items-center justify-center gap-2">
+<span class="material-icons-outlined text-base">add</span>
+                                    New Request
+                                </button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-5">
+<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wider text-xs text-gray-500 dark:text-gray-400">Important Contacts</h3>
+<ul class="space-y-3">
+<li class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+<span class="material-icons-outlined text-gray-500 dark:text-gray-400 text-sm">person</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Warden (Mr. Sharma)</p>
+<p class="text-xs text-primary cursor-pointer hover:underline">+91 98765 43210</p>
+</div>
+</li>
+<li class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+<span class="material-icons-outlined text-gray-500 dark:text-gray-400 text-sm">local_hospital</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Emergency</p>
+<p class="text-xs text-primary cursor-pointer hover:underline">108</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

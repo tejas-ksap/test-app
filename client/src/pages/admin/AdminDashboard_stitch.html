@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Premium Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3b82f6", // Keeping a standard blue as primary anchor
+                        "background-light": "#f3f4f6", // Light gray for main area
+                        "background-dark": "#0f172a", // Slate-900 for dark mode background
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b", // Slate-800
+                        "sidebar-dark": "#0f172a", // Slate-900
+                        "sidebar-light": "#1e293b", // Keeping sidebar dark in light mode too as per standard admin dashboards, or making it distinct. Prompt says "Slim, dark-themed sidebar".
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-600 dark:text-slate-300 antialiased h-screen flex overflow-hidden selection:bg-primary selection:text-white">
+<aside class="w-64 bg-slate-900 dark:bg-black text-white flex-shrink-0 flex flex-col transition-all duration-300 border-r border-slate-800 dark:border-slate-800">
+<div class="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900 dark:bg-black">
+<div class="flex items-center gap-2 font-display font-bold text-xl text-white tracking-tight">
+<span class="material-icons-outlined text-primary">apartment</span>
+<span>PG Admin</span>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-[20px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-[20px] group-hover:text-white transition-colors">people</span>
+                Manage Users
+            </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-[20px] group-hover:text-white transition-colors">home_work</span>
+                Manage PGs
+            </a>
+<a class="group flex items-center px-3 py-2.5 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-icons-outlined mr-3 text-[20px] group-hover:text-white transition-colors">receipt_long</span>
+                Manage Bookings
+            </a>
+</nav>
+<div class="p-4 border-t border-slate-800">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">
+                    AD
+                </div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-white truncate">adminUser2</p>
+<p class="text-xs text-slate-400 truncate">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<header class="bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-700 h-16 flex items-center justify-between px-6 lg:px-8 z-10">
+<div class="flex items-center">
+<h1 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight">Dashboard Overview</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors relative">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
+</button>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all">
+<span class="material-icons-outlined text-[18px]">logout</span>
+                    Logout
+                </button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-6 lg:p-8">
+<div class="max-w-7xl mx-auto space-y-8">
+<div>
+<h2 class="text-2xl font-display font-bold text-slate-900 dark:text-white mb-2">Welcome back, Admin!</h2>
+<p class="text-slate-500 dark:text-slate-400">Here's what's happening with your properties today.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<a class="group relative bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md border border-slate-100 dark:border-slate-700 transition-all duration-300 flex flex-col items-center justify-center text-center gap-4 h-64 overflow-hidden" href="#">
+<div class="absolute inset-0 bg-indigo-50 dark:bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 h-16 w-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+<span class="material-icons-outlined text-3xl text-indigo-600 dark:text-indigo-400">person_outline</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">Manage Users</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">View, edit, and manage user accounts</p>
+</div>
+<div class="mt-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 flex items-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
+                            View All Users <span class="material-icons-outlined text-sm ml-1">arrow_forward</span>
+</div>
+</a>
+<a class="group relative bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md border border-slate-100 dark:border-slate-700 transition-all duration-300 flex flex-col items-center justify-center text-center gap-4 h-64 overflow-hidden" href="#">
+<div class="absolute inset-0 bg-emerald-50 dark:bg-emerald-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 h-16 w-16 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+<span class="material-icons-outlined text-3xl text-emerald-600 dark:text-emerald-400">home</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">Manage PGs</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Add and oversee PG listings</p>
+</div>
+<div class="mt-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
+                            View Properties <span class="material-icons-outlined text-sm ml-1">arrow_forward</span>
+</div>
+</a>
+<a class="group relative bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md border border-slate-100 dark:border-slate-700 transition-all duration-300 flex flex-col items-center justify-center text-center gap-4 h-64 overflow-hidden" href="#">
+<div class="absolute inset-0 bg-amber-50 dark:bg-amber-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<div class="relative z-10 h-16 w-16 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+<span class="material-icons-outlined text-3xl text-amber-600 dark:text-amber-400">assignment_turned_in</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-1">Manage Bookings</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Track reservations and status</p>
+</div>
+<div class="mt-2 text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 duration-300">
+                            Check Requests <span class="material-icons-outlined text-sm ml-1">arrow_forward</span>
+</div>
+</a>
+</div>
+<div class="mt-8">
+<h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Quick Stats</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+<div>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Users</p>
+<p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">1,248</p>
+</div>
+<div class="text-green-500 bg-green-50 dark:bg-green-900/20 p-1 rounded">
+<span class="material-icons-outlined text-lg">trending_up</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+<div>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active PGs</p>
+<p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">86</p>
+</div>
+<div class="text-blue-500 bg-blue-50 dark:bg-blue-900/20 p-1 rounded">
+<span class="material-icons-outlined text-lg">domain</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+<div>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pending Requests</p>
+<p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">12</p>
+</div>
+<div class="text-amber-500 bg-amber-50 dark:bg-amber-900/20 p-1 rounded">
+<span class="material-icons-outlined text-lg">pending</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+<div>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Revenue (Mo)</p>
+<p class="text-2xl font-bold text-slate-900 dark:text-white mt-1">$14.2k</p>
+</div>
+<div class="text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 p-1 rounded">
+<span class="material-icons-outlined text-lg">attach_money</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
