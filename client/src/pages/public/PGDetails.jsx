@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import WishlistButton from "../../components/common/WishlistButton";
+import ReviewSection from "../../components/common/ReviewSection";
 
 const PgDetails = () => {
   const { id } = useParams();
@@ -117,6 +119,7 @@ const PgDetails = () => {
               alt="Main"
               className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
             />
+            <WishlistButton pgId={id} className="right-4 top-4 w-12 h-12 flex items-center justify-center text-primary hover:text-red-500" />
           </div>
           <div className="hidden md:flex md:col-span-4 flex-col gap-4 h-full">
             <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
@@ -229,6 +232,9 @@ const PgDetails = () => {
                 </div>
               </div>
             )}
+
+            {/* Review Section */}
+            <ReviewSection pgId={id} />
           </div>
 
           {/* Sticky Booking Card (Right) */}

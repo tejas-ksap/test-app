@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import WishlistButton from "../../components/common/WishlistButton";
 
 const HomePage = () => {
   const [pgs, setPgs] = useState([]);
@@ -94,10 +95,11 @@ const HomePage = () => {
                       }}
                     />
                     {isVerified && (
-                      <div className="absolute top-4 right-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-sm">
+                      <div className="absolute top-4 right-16 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-sm">
                         <span className="material-icons-outlined text-sm">verified</span> Verified
                       </div>
                     )}
+                    <WishlistButton pgId={pg.id || pg.pgId} />
                     <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-black/70 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-semibold text-gray-900 dark:text-white shadow-sm">
                       {typeStr}
                     </div>
