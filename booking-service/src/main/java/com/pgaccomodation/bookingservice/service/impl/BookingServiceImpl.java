@@ -152,5 +152,9 @@ public class BookingServiceImpl implements BookingService {
 	    }).collect(Collectors.toList());
 	}
 
+	@Override
+	public List<BookingWithUsername> getBookingsWithUsernames(Integer pgId) {
+		return bookingRepository.findBookingsWithUserInfoByPgId(pgId);
+	}
 	
 }
