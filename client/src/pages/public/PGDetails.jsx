@@ -115,7 +115,7 @@ const PgDetails = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-[400px] md:h-[550px] mb-12">
           <div className="md:col-span-8 h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
             <img
-              src={pg.imageUrl || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80"}
+              src={!pg.imageUrl ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80" : pg.imageUrl.startsWith('http') ? pg.imageUrl : `${api.defaults.baseURL}/api/users/images/${pg.imageUrl}`}
               alt="Main"
               className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
             />
@@ -210,7 +210,7 @@ const PgDetails = () => {
                     >
                       <div className="w-full sm:w-48 h-32 rounded-2xl overflow-hidden shrink-0">
                         <img
-                          src={other.imageUrl || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"}
+                          src={!other.imageUrl ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80" : other.imageUrl.startsWith('http') ? other.imageUrl : `${api.defaults.baseURL}/api/users/images/${other.imageUrl}`}
                           alt={other.name}
                           className="w-full h-full object-cover"
                         />

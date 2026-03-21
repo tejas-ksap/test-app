@@ -9,9 +9,11 @@ const Profile = () => {
     fullName: "",
     email: "",
     phone: "",
+    profilePic: "",
     isActive: true
   });
   const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
@@ -22,6 +24,7 @@ const Profile = () => {
           fullName: res.data.fullName || "",
           email: res.data.email || "",
           phone: res.data.phone || "",
+          profilePic: res.data.profilePic || "",
           isActive: res.data.isActive !== false
         });
       } catch (err) {
@@ -35,6 +38,32 @@ const Profile = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setImageUploading(true);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+    try {
+      const uploadRes = await api.post("/api/users/images/upload", uploadData);
+      const imageId = uploadRes.data.imageKey;
+      
+      // Instantly update UI and Auto-Save to database
+      setFormData(prev => ({ ...prev, profilePic: imageId }));
+      
+      const putData = { ...formData, profilePic: imageId };
+      const saveRes = await api.put("/api/users/me", putData);
+      login(token, saveRes.data); 
+      
+      toast.success("Profile picture updated and saved!");
+    } catch (err) {
+      toast.error("Failed to upload image.");
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -72,6 +101,35 @@ const Profile = () => {
 
       <div className="max-w-2xl bg-white dark:bg-gray-800 rounded-3xl shadow-soft border border-gray-100 dark:border-gray-700 p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex flex-col items-center mb-6">
+            <div className="relative group cursor-pointer">
+              <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-50 dark:border-gray-700 shadow-md">
+                {formData.profilePic ? (
+                  <img src={formData.profilePic.startsWith('http') ? formData.profilePic : `${api.defaults.baseURL}/api/users/images/${formData.profilePic}`} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <span className="material-icons-outlined text-4xl text-gray-400">person</span>
+                  </div>
+                )}
+                {imageUploading && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                  </div>
+                )}
+              </div>
+              <div className="absolute bottom-0 right-0 bg-[var(--primary)] text-white p-2 rounded-full shadow-lg transform translate-x-1/4 translate-y-1/4 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-sm">edit</span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={imageUploading}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Full Name

@@ -43,23 +43,29 @@ const RegisterPG = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
+  const [uploadingImages, setUploadingImages] = useState(false);
+
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-    Promise.all(
-      files.map((file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (error) => reject(error);
-        });
-      })
-    ).then((base64Images) => {
-      setFormData((prev) => ({ ...prev, images: base64Images }));
-    }).catch((err) => {
-      console.error("Error reading files", err);
-      setError("Failed to process images.");
-    });
+    if (!files || files.length === 0) return;
+    
+    setUploadingImages(true);
+    try {
+      const uploadedImageKeys = await Promise.all(
+        files.map(async (file) => {
+          const uploadData = new FormData();
+          uploadData.append("file", file);
+          const res = await api.post("/api/users/images/upload", uploadData);
+          return res.data.imageKey;
+        })
+      );
+      setFormData((prev) => ({ ...prev, images: [...prev.images, ...uploadedImageKeys] }));
+    } catch (err) {
+      console.error("Error uploading files", err);
+      setError("Failed to upload exactly one or more images.");
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -399,10 +405,15 @@ const RegisterPG = () => {
                   multiple
                   accept="image/*"
                   onChange={handleImageChange}
+                  disabled={uploadingImages}
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
                 />
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                  <span className="material-icons-outlined text-3xl text-[#5A45FF]">cloud_upload</span>
+                  {uploadingImages ? (
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5A45FF]"></div>
+                  ) : (
+                    <span className="material-icons-outlined text-3xl text-[#5A45FF]">cloud_upload</span>
+                  )}
                 </div>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">Drag and drop photos here</p>
                 <p className="text-gray-500 dark:text-gray-400 mt-1">Or click to browse from your computer (Max 10 photos)</p>
@@ -412,7 +423,7 @@ const RegisterPG = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
                   {formData.images.slice(0, 6).map((img, idx) => (
                     <div key={idx} className="aspect-square rounded-xl overflow-hidden shadow-sm relative group">
-                      <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                      <img src={img.startsWith('http') ? img : `${api.defaults.baseURL}/api/users/images/${img}`} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <span className="material-icons text-white cursor-pointer">delete</span>
                       </div>

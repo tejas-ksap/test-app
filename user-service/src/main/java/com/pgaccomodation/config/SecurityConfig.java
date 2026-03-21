@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 	    .requestMatchers("/api/users/register").permitAll()
+                	    .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/images/**").permitAll()
                 	    .requestMatchers("/api/users/me").authenticated()
                 	    .anyRequest().permitAll() // Optional if you want everything else public
                 	)
