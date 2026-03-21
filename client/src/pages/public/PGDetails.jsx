@@ -12,6 +12,8 @@ const PgDetails = () => {
   const { user } = useAuth();
   const [pg, setPg] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [otherPgs, setOtherPgs] = useState([]);
   const [bookingData, setBookingData] = useState({
     roomType: "",
@@ -21,6 +23,9 @@ const PgDetails = () => {
   });
 
   useEffect(() => {
+    setGalleryIndex(0);
+    setShowGallery(false);
+    
     const fetchPg = async () => {
       try {
         const res = await api.get(`/api/pg-properties/${id}`);
@@ -113,20 +118,39 @@ const PgDetails = () => {
 
         {/* Gallery Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-[400px] md:h-[550px] mb-12">
-          <div className="md:col-span-8 h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
+          <div 
+            className="md:col-span-8 h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-sm relative cursor-pointer group"
+            onClick={() => { if (pg.images && pg.images.length > 0) { setGalleryIndex(0); setShowGallery(true); } }}
+          >
             <img
               src={!pg.images || pg.images.length === 0 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80" : pg.images[0].startsWith('http') ? pg.images[0] : `${api.defaults.baseURL}/api/users/images/${pg.images[0]}`}
               alt="Main"
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
+              className="w-full h-full object-cover transition-transform group-hover:scale-[1.02] duration-700"
             />
-            <WishlistButton pgId={id} className="right-4 top-4 w-12 h-12 flex items-center justify-center text-primary hover:text-red-500" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+            <WishlistButton pgId={id} className="right-4 top-4 w-12 h-12 flex items-center justify-center text-primary hover:text-red-500 z-10 box-content p-2" />
           </div>
           <div className="hidden md:flex md:col-span-4 flex-col gap-4 h-full">
-            <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
-              <img src={!pg.images || pg.images.length <= 1 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" : pg.images[1].startsWith('http') ? pg.images[1] : `${api.defaults.baseURL}/api/users/images/${pg.images[1]}`} alt="Interior 1" className="w-full h-full object-cover" />
+            <div 
+              className="h-1/2 rounded-3xl overflow-hidden shadow-sm relative cursor-pointer group"
+              onClick={() => { if (pg.images && pg.images.length > 0) { setGalleryIndex(Math.min(1, pg.images.length - 1)); setShowGallery(true); } }}
+            >
+              <img src={!pg.images || pg.images.length <= 1 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" : pg.images[1].startsWith('http') ? pg.images[1] : `${api.defaults.baseURL}/api/users/images/${pg.images[1]}`} alt="Interior 1" className="w-full h-full object-cover transition-transform group-hover:scale-[1.03] duration-700" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
             </div>
-            <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
-              <img src={!pg.images || pg.images.length <= 2 ? "https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=800&q=80" : pg.images[2].startsWith('http') ? pg.images[2] : `${api.defaults.baseURL}/api/users/images/${pg.images[2]}`} alt="Interior 2" className="w-full h-full object-cover" />
+            <div 
+              className="h-1/2 rounded-3xl overflow-hidden shadow-sm relative cursor-pointer group"
+              onClick={() => { if (pg.images && pg.images.length > 0) { setGalleryIndex(Math.min(2, pg.images.length - 1)); setShowGallery(true); } }}
+            >
+              <img src={!pg.images || pg.images.length <= 2 ? "https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=800&q=80" : pg.images[2].startsWith('http') ? pg.images[2] : `${api.defaults.baseURL}/api/users/images/${pg.images[2]}`} alt="Interior 2" className="w-full h-full object-cover transition-transform group-hover:scale-[1.03] duration-700" />
+              {pg.images && pg.images.length > 3 && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/50 transition-colors duration-300">
+                  <span className="text-white font-bold text-xl tracking-wide">+{pg.images.length - 3} Photos</span>
+                </div>
+              )}
+              {pg.images && pg.images.length <= 3 && (
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+              )}
             </div>
           </div>
         </div>
@@ -321,6 +345,82 @@ const PgDetails = () => {
         </div>
 
       </div>
+
+      {/* Lightbox Modal Overlay */}
+      {showGallery && pg.images && (
+        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+          
+          {/* Centered Modal Container */}
+          <div className="bg-white dark:bg-[#1a1a24] w-full max-w-5xl rounded-[1.5rem] flex flex-col relative overflow-hidden ring-1 ring-gray-200 dark:ring-white/10 shadow-2xl">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 md:px-6 border-b border-gray-100 dark:border-white/5">
+              <h3 className="text-gray-900 dark:text-white font-bold text-lg tracking-tight">
+                {galleryIndex + 1} / {pg.images.length} Photos
+              </h3>
+              <button 
+                onClick={() => setShowGallery(false)}
+                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 transition"
+              >
+                <span className="material-icons-outlined text-xl">close</span>
+              </button>
+            </div>
+
+            {/* Main Focused Image & Controls */}
+            <div className="relative w-full h-[50vh] md:h-[65vh] bg-gray-50 dark:bg-black/40 flex items-center justify-center group p-4">
+              
+              {/* Left Button */}
+              <button 
+                onClick={() => setGalleryIndex(prev => Math.max(0, prev - 1))}
+                disabled={galleryIndex === 0}
+                className={`absolute left-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black flex items-center justify-center text-gray-800 dark:text-white transition z-20 border border-gray-200 dark:border-white/10 shadow-sm ${galleryIndex === 0 ? 'opacity-30 cursor-not-allowed hidden md:flex' : 'opacity-0 group-hover:opacity-100'} -translate-x-2 group-hover:translate-x-0`}
+              >
+                <span className="material-icons-outlined">chevron_left</span>
+              </button>
+              
+              {/* Spotlight Image */}
+              <div className="w-full h-full flex items-center justify-center outline-none">
+                {pg.images[galleryIndex] && (
+                  <img 
+                     src={pg.images[galleryIndex].startsWith('http') ? pg.images[galleryIndex] : `${api.defaults.baseURL}/api/users/images/${pg.images[galleryIndex]}`} 
+                     alt={`HD View ${galleryIndex + 1}`}
+                     className="max-w-full max-h-full object-contain rounded-md select-none"
+                  />
+                )}
+              </div>
+
+              {/* Right Button */}
+              <button 
+                onClick={() => setGalleryIndex(prev => Math.min(pg.images.length - 1, prev + 1))}
+                disabled={galleryIndex === pg.images.length - 1}
+                className={`absolute right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black flex items-center justify-center text-gray-800 dark:text-white transition z-20 border border-gray-200 dark:border-white/10 shadow-sm ${galleryIndex === pg.images.length - 1 ? 'opacity-30 cursor-not-allowed hidden md:flex' : 'opacity-0 group-hover:opacity-100'} translate-x-2 group-hover:translate-x-0`}
+              >
+                <span className="material-icons-outlined">chevron_right</span>
+              </button>
+            </div>
+
+            {/* Thumbnails Action Ribbon */}
+            <div className="bg-white dark:bg-[#1a1a24] p-4 shrink-0 overflow-x-auto hide-scrollbar border-t border-gray-100 dark:border-white/5">
+              <div className="flex gap-3 justify-start md:justify-center min-w-min mx-auto w-max px-2">
+                {pg.images.map((img, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => setGalleryIndex(idx)}
+                    className={`flex-shrink-0 relative overflow-hidden rounded-lg border-2 transition-all duration-300 outline-none ${galleryIndex === idx ? 'border-[#5A45FF] dark:border-white scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                  >
+                    <img 
+                      src={img.startsWith('http') ? img : `${api.defaults.baseURL}/api/users/images/${img}`} 
+                      alt={`Thumbnail ${idx + 1}`} 
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover pointer-events-none rounded-md"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };
