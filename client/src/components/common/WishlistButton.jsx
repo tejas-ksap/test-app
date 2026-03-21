@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const WishlistButton = ({ pgId, className = "" }) => {
+const WishlistButton = ({ pgId, className = "", onWishlistChange }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -18,7 +18,8 @@ const WishlistButton = ({ pgId, className = "" }) => {
 
   const checkWishlistStatus = async () => {
     try {
-      const res = await api.get(`/api/users/${user.userid}/wishlist/${pgId}/check`);
+      const userId = user?.userid || user?.id;
+      const res = await api.get(`/api/users/${userId}/wishlist/${pgId}/check`);
       setIsWishlisted(res.data);
     } catch (err) {
       console.error("Failed to check wishlist status", err);
@@ -35,14 +36,17 @@ const WishlistButton = ({ pgId, className = "" }) => {
     
     setLoading(true);
     try {
+      const userId = user?.userid || user?.id;
       if (isWishlisted) {
-        await api.delete(`/api/users/${user.userid}/wishlist/${pgId}`);
+        await api.delete(`/api/users/${userId}/wishlist/${pgId}`);
         setIsWishlisted(false);
         toast.success("Removed from wishlist");
+        if (onWishlistChange) onWishlistChange(pgId, false);
       } else {
-        await api.post(`/api/users/${user.userid}/wishlist/${pgId}`);
+        await api.post(`/api/users/${userId}/wishlist/${pgId}`);
         setIsWishlisted(true);
         toast.success("Added to wishlist");
+        if (onWishlistChange) onWishlistChange(pgId, true);
       }
     } catch (err) {
       console.error("Wishlist action failed", err);
@@ -60,7 +64,7 @@ const WishlistButton = ({ pgId, className = "" }) => {
       aria-label="Toggle Wishlist"
     >
       <span className={`material-icons text-xl ${isWishlisted ? 'text-red-500' : 'text-gray-400'}`}>
-        {isWishlisted ? 'favorite' : 'favorite_border'}
+        {isWishlisted ? '❤️' : '🤍'}
       </span>
     </button>
   );

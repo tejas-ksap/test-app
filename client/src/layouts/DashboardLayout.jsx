@@ -25,6 +25,7 @@ const NAV_LINKS = {
   TENANT: [
     { path: "/tenant/dashboard", icon: "📊", label: "Dashboard" },
     { path: "/tenant/my-bookings", icon: "📑", label: "My Bookings" },
+    { path: "/tenant/wishlist", icon: "❤️", label: "Wishlist" },
   ],
 };
 

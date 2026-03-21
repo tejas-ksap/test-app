@@ -17,6 +17,7 @@ import OwnerTenants from "./pages/owner/OwnerTenants";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPGs from "./pages/admin/AdminPGs";
 import AdminBookings from "./pages/admin/AdminBookings";
+import Wishlist from "./pages/tenant/Wishlist";
 
 
 
@@ -82,6 +83,7 @@ const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <TenantDashboard /> },
           { path: "my-bookings", element: <MyBookings /> },
+          { path: "wishlist", element: <Wishlist /> },
         ],
       },
     ],
