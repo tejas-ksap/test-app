@@ -15,17 +15,20 @@ const NAV_LINKS = {
     { path: "/admin/users", icon: "👤", label: "Manage Users" },
     { path: "/admin/pgs", icon: "🏠", label: "Manage PGs" },
     { path: "/admin/bookings", icon: "📑", label: "Manage Bookings" },
+    { path: "/admin/profile", icon: "⚙️", label: "Edit Profile" },
   ],
   OWNER: [
     { path: "/owner/dashboard", icon: "📊", label: "Dashboard" },
     { path: "/owner/register-pg", icon: "➕", label: "Register PG" },
     { path: "/owner/pg-list", icon: "📄", label: "View PGs" },
     { path: "/owner/tenants", icon: "👥", label: "Your Tenants" },
+    { path: "/owner/profile", icon: "⚙️", label: "Edit Profile" },
   ],
   TENANT: [
     { path: "/tenant/dashboard", icon: "📊", label: "Dashboard" },
     { path: "/tenant/my-bookings", icon: "📑", label: "My Bookings" },
     { path: "/tenant/wishlist", icon: "❤️", label: "Wishlist" },
+    { path: "/tenant/profile", icon: "⚙️", label: "Edit Profile" },
   ],
 };
 

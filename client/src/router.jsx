@@ -18,6 +18,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPGs from "./pages/admin/AdminPGs";
 import AdminBookings from "./pages/admin/AdminBookings";
 import Wishlist from "./pages/tenant/Wishlist";
+import Profile from "./pages/common/Profile";
 
 
 
@@ -51,6 +52,7 @@ const router = createBrowserRouter([
           { path: "users", element: <AdminUsers /> },
           { path: "pgs", element: <AdminPGs /> },
           { path: "bookings", element: <AdminBookings /> },
+          { path: "profile", element: <Profile /> },
         ],
       },
     ],
@@ -68,6 +70,7 @@ const router = createBrowserRouter([
           { path: "register-pg", element: <RegisterPG /> },
           { path: "pg-list", element: <ViewListedPGs /> },
           { path: "tenants", element: <OwnerTenants /> },
+          { path: "profile", element: <Profile /> },
         ],
       },
     ],
@@ -84,6 +87,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <TenantDashboard /> },
           { path: "my-bookings", element: <MyBookings /> },
           { path: "wishlist", element: <Wishlist /> },
+          { path: "profile", element: <Profile /> },
         ],
       },
     ],

@@ -93,6 +93,19 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/me")
+    public ResponseEntity<User> updateCurrentUser(HttpServletRequest request, @RequestBody User updatedUser) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        String username = jwtUtil.extractUsername(token);
+        return userService.getUserByUsername(username)
+                .map(currentUser -> {
+                    User user = userService.updateUser(currentUser.getUserid(), updatedUser);
+                    return ResponseEntity.ok(user);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // Example: Only OWNERs can access this
     @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/owner/only")
