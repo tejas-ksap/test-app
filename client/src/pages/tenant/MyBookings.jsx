@@ -57,11 +57,10 @@ const MyBookings = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-6 lg:px-0">
           <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">My Bookings</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg font-medium">Your active and past property reservations.</p>
+            <h1 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">My Bookings</h1>
           </div>
           <div className="flex items-center gap-2 bg-white dark:bg-gray-900/50 p-2 rounded-2xl border border-gray-100 dark:border-gray-800 backdrop-blur-sm">
-            <span className="px-4 py-2 bg-[#5A45FF]/10 text-[#5A45FF] dark:text-[#8E7DFF] rounded-xl text-sm font-black uppercase tracking-widest">
+            <span className="px-4 py-2 bg-[#5A45FF]/10 text-[#5A45FF] dark:text-[#8E7DFF] rounded-xl text-sm font-black tracking-widest">
               Total: {bookings.length}
             </span>
           </div>
@@ -93,9 +92,9 @@ const MyBookings = () => {
                const deposit = b.pg?.depositAmount?.parsedValue ?? b.pg?.depositAmount ?? 0;
                
                return (
-                 <div key={b.id} className="group relative bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-500 border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col md:flex-row backdrop-blur-md">
+                 <div key={b.id} className="group relative bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-500 border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-row backdrop-blur-md h-40 md:h-36">
                     {/* Image Section */}
-                    <div className="w-full md:w-80 h-64 md:h-auto relative shrink-0 overflow-hidden cursor-pointer" onClick={() => navigate(`/pg/${b.pgId}`)}>
+                    <div className="w-32 md:w-48 h-full relative shrink-0 overflow-hidden cursor-pointer" onClick={() => navigate(`/pg/${b.pgId}`)}>
                       <img 
                         alt={b.pg?.name} 
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -111,67 +110,60 @@ const MyBookings = () => {
                     </div>
 
                     {/* Info Section */}
-                    <div className="p-8 flex-grow flex flex-col justify-between">
-                       <div className="space-y-6">
+                    <div className="p-4 flex-grow flex flex-col justify-between overflow-hidden">
+                       <div className="space-y-2">
                           {/* Header */}
                           <div className="flex justify-between items-start">
                              <div className="space-y-1">
-                                <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight cursor-pointer hover:text-[#5A45FF] transition-colors" onClick={() => navigate(`/pg/${b.pgId}`)}>
-                                  {b.pg?.name || 'Loading...'}
-                                </h3>
-                                <p className="text-gray-500 dark:text-gray-400 font-medium flex items-center gap-2 italic">
-                                  <PiMapPin size={20} className="text-[#5A45FF]" /> 
-                                  {b.pg?.address ? `${b.pg.address}, ${b.pg.city}` : 'N/A'}
-                                </p>
-                             </div>
-                             <div className={`px-5 py-2 text-[10px] font-black rounded-full uppercase tracking-[0.2em] flex items-center shrink-0 border-2 ${statusColor(b.status)} border-current/10 shadow-sm`}>
-                                {b.status === "CONFIRMED" || b.status === "APPROVED" ? <PiChecksBold size={14} className="mr-2" /> : null} 
-                                {b.status}
-                             </div>
-                          </div>
+                                 <h3 className="text-base font-black text-gray-900 dark:text-white truncate cursor-pointer hover:text-[#5A45FF] transition-colors" onClick={() => navigate(`/pg/${b.pgId}`)}>
+                                   {b.pg?.name || 'Loading...'}
+                                 </h3>
+                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium flex items-center gap-1">
+                                   <PiMapPin size={12} className="text-[#5A45FF]" /> 
+                                   <span className="truncate">{b.pg?.address ? `${b.pg.address}, ${b.pg.city}` : 'N/A'}</span>
+                                 </p>
+                              </div>
+                              <div className={`px-3 py-1 text-[8px] font-black rounded-full uppercase tracking-widest flex items-center shrink-0 border ${statusColor(b.status)} border-current/10 shadow-sm`}>
+                                 {b.status}
+                              </div>
+                           </div>
 
-                          {/* Quick Stats Grid */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                             <div className="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-800 flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-[#5A45FF]/10 flex items-center justify-center text-[#5A45FF]">
-                                   <PiCalendarBlank size={24} />
+                           {/* Quick Stats Row */}
+                          <div className="flex items-center gap-4 flex-wrap">
+                             <div className="flex items-center gap-2">
+                                <div className="p-1.5 bg-[#5A45FF]/5 rounded-lg text-[#5A45FF]">
+                                   <PiCalendarBlank size={15} />
                                 </div>
-                                <div>
-                                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Move-in Date</p>
-                                   <p className="text-gray-900 dark:text-gray-200 font-bold text-lg">
-                                      {b.startDate ? new Date(b.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
-                                   </p>
-                                   <p className="text-[10px] text-[#5A45FF] font-black uppercase mt-0.5">{calculateMonths(b.startDate, b.endDate)} Months Stay</p>
-                                </div>
+                                <span className="text-sm font-bold text-gray-700 dark:text-gray-200">
+                                   {b.startDate ? new Date(b.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
+                                </span>
+                                <span className="text-[10px] text-[#5A45FF] font-black uppercase tracking-tight bg-[#5A45FF]/5 px-2 py-0.5 rounded-full">{calculateMonths(b.startDate, b.endDate)}M Stay</span>
                              </div>
-                             <div className="p-5 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-800 flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">
-                                   <PiCurrencyInr size={24} />
+                             <div className="flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-4">
+                                <div className="p-1.5 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg text-emerald-600">
+                                   <PiCurrencyInr size={15} />
                                 </div>
-                                <div>
-                                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pricing</p>
-                                   <p className="text-emerald-600 dark:text-emerald-400 font-black text-2xl tracking-tighter">₹{price.toLocaleString()}</p>
-                                   <p className="text-[10px] text-gray-500 font-black uppercase mt-0.5">Deposit: ₹{deposit.toLocaleString()}</p>
-                                </div>
+                                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">₹{price.toLocaleString()}</span>
+                                <span className="text-xs text-gray-400 font-semibold">· Dep: ₹{deposit.toLocaleString()}</span>
                              </div>
                           </div>
                        </div>
-
+ 
                        {/* Action Footer */}
-                       <div className="flex items-center justify-between pt-8 mt-4 border-t border-gray-100 dark:border-gray-800">
-                          <div className="flex flex-col">
-                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Booking ID</p>
-                             <p className="text-sm font-bold text-gray-600 dark:text-gray-500">#{b.id.toString().slice(-8).toUpperCase()}</p>
-                          </div>
-                          
-                          {(b.status !== "CANCELLED" && b.status !== "REJECTED") && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleCancel(b.id); }}
-                                className="px-8 py-3 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-rose-600 hover:text-white transition-all border border-rose-100 dark:border-rose-900/30 active:scale-95 flex items-center gap-2"
-                              >
-                                 <PiXBold size={16} /> Cancel Booking
-                              </button>
-                          )}
+                       <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
+                           <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Booking ID:</span>
+                              <span className="text-[10px] font-bold text-gray-600 dark:text-gray-500 leading-none">#{b.id.toString().slice(-8).toUpperCase()}</span>
+                           </div>
+                           
+                           {(b.status !== "CANCELLED" && b.status !== "REJECTED") && (
+                               <button
+                                 onClick={(e) => { e.stopPropagation(); handleCancel(b.id); }}
+                                 className="px-5 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-rose-600 hover:text-white transition-all border border-rose-100 dark:border-rose-900/30 active:scale-95 flex items-center gap-2"
+                               >
+                                  <PiXBold size={14} /> Cancel Booking
+                               </button>
+                           )}
                        </div>
                     </div>
                  </div>
