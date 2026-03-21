@@ -4,10 +4,14 @@ import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import WishlistButton from "../../components/common/WishlistButton";
+import BookingModal from "../../components/common/BookingModal";
+import { PiHeart, PiCheckCircleFill, PiStarFill, PiMapPin, PiInfo, PiWifiHigh, PiSnowflake, PiForkKnife, PiWashingMachine } from "react-icons/pi";
 
 const Wishlist = () => {
   const [wishlistPgs, setWishlistPgs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedPGForBooking, setSelectedPGForBooking] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -40,9 +44,10 @@ const Wishlist = () => {
     fetchWishlist();
   }, [user]);
 
-  const handleBookNow = (e, pgId) => {
+  const handleBookNow = (e, pg) => {
     e.stopPropagation();
-    navigate("/tenant/available-pgs");
+    setSelectedPGForBooking(pg);
+    setIsBookingModalOpen(true);
   };
 
   return (
@@ -62,7 +67,7 @@ const Wishlist = () => {
         </div>
       ) : wishlistPgs.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-soft text-center h-64 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700">
-            <span className="material-icons-outlined text-gray-300 dark:text-gray-600 text-6xl mb-4">favorite_border</span>
+            <PiHeart className="text-gray-300 dark:text-gray-600 text-6xl mb-4 drop-shadow-sm" />
             <p className="text-lg text-gray-500 font-medium">Your wishlist is empty.</p>
             <button 
               onClick={() => navigate("/")} 
@@ -91,8 +96,8 @@ const Wishlist = () => {
                     }}
                   />
                   {isVerified && (
-                    <div className="absolute top-4 right-16 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm backdrop-blur-sm">
-                      <span className="material-icons-outlined text-sm">verified</span> Verified
+                    <div className="absolute top-4 right-16 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm backdrop-blur-sm">
+                      <PiCheckCircleFill className="text-base" /> Verified
                     </div>
                   )}
                   <WishlistButton 
@@ -111,36 +116,36 @@ const Wishlist = () => {
                 <div className="p-6 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{title}</h3>
-                    <div className="flex items-center gap-1 text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded text-sm font-semibold">
-                      <span className="material-icons-outlined text-base">star</span> {pg.rating?.parsedValue ?? pg.rating ?? "4.5"}
+                    <div className="flex items-center gap-1 text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-2.5 py-1 rounded-md text-sm font-semibold border border-yellow-100 dark:border-yellow-900/50">
+                      <PiStarFill className="text-base" /> {pg.rating?.parsedValue ?? pg.rating ?? "4.5"}
                     </div>
                   </div>
 
                   <p className="text-primary font-bold text-lg mb-4">₹{price}<span className="text-sm text-gray-600 dark:text-gray-400 font-normal">/bed</span></p>
 
-                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2 mb-6">
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons-outlined text-gray-400 text-lg mt-0.5">location_on</span>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2.5 mb-6">
+                    <div className="flex items-start gap-2.5">
+                      <PiMapPin className="text-gray-400 text-lg shrink-0 mt-0.5" />
                       <span className="line-clamp-2">{pg.address}, {pg.city} (Landmark: {pg.landmark || 'N/A'})</span>
                     </div>
-                    <div className="flex items-start gap-2">
-                      <span className="material-icons-outlined text-gray-400 text-lg mt-0.5">info</span>
-                      <span className="line-clamp-2">{pg.description || 'Comfortable and safe PG.'}</span>
+                    <div className="flex items-start gap-2.5">
+                      <PiInfo className="text-gray-400 text-lg shrink-0 mt-0.5" />
+                      <span className="line-clamp-2">{pg.description || 'Comfortable and safe PG for professionals and students.'}</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6 mt-auto">
-                    <div className={`flex items-center gap-2 text-sm ${pg.wifiAvailable ? 'text-gray-600 dark:text-gray-400' : 'text-gray-600 dark:text-gray-400 opacity-50'}`}>
-                      <span className={`material-icons-outlined text-base ${pg.wifiAvailable ? 'text-green-500' : 'text-gray-400'}`}>wifi</span> {pg.wifiAvailable ? 'WiFi' : 'No WiFi'}
+                    <div className={`flex items-center gap-2 text-sm ${pg.wifiAvailable ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                      <PiWifiHigh className={`text-lg ${pg.wifiAvailable ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'}`} /> {pg.wifiAvailable ? 'WiFi' : 'No WiFi'}
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${pg.acAvailable ? 'text-gray-600 dark:text-gray-400' : 'text-gray-600 dark:text-gray-400 opacity-50'}`}>
-                      <span className={`material-icons-outlined text-base ${pg.acAvailable ? 'text-green-500' : 'text-gray-400'}`}>ac_unit</span> {pg.acAvailable ? 'AC' : 'No AC'}
+                    <div className={`flex items-center gap-2 text-sm ${pg.acAvailable ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                      <PiSnowflake className={`text-lg ${pg.acAvailable ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'}`} /> {pg.acAvailable ? 'AC' : 'No AC'}
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${pg.foodIncluded ? 'text-gray-600 dark:text-gray-400' : 'text-gray-600 dark:text-gray-400 opacity-50'}`}>
-                      <span className={`material-icons-outlined text-base ${pg.foodIncluded ? 'text-green-500' : 'text-gray-400'}`}>restaurant</span> {pg.foodIncluded ? 'Food Incl.' : 'No Food'}
+                    <div className={`flex items-center gap-2 text-sm ${pg.foodIncluded ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                      <PiForkKnife className={`text-lg ${pg.foodIncluded ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'}`} /> {pg.foodIncluded ? 'Food Incl.' : 'No Food'}
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${pg.laundryAvailable ? 'text-gray-600 dark:text-gray-400' : 'text-gray-600 dark:text-gray-400 opacity-50'}`}>
-                      <span className={`material-icons-outlined text-base ${pg.laundryAvailable ? 'text-green-500' : 'text-gray-400'}`}>local_laundry_service</span> {pg.laundryAvailable ? 'Laundry' : 'No Laundry'}
+                    <div className={`flex items-center gap-2 text-sm ${pg.laundryAvailable ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}`}>
+                      <PiWashingMachine className={`text-lg ${pg.laundryAvailable ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'}`} /> {pg.laundryAvailable ? 'Laundry' : 'No Laundry'}
                     </div>
                   </div>
 
@@ -149,7 +154,7 @@ const Wishlist = () => {
                     <div>Deposit: <span className="font-semibold text-gray-900 dark:text-white">₹{pg.depositAmount?.parsedValue ?? pg.depositAmount}</span></div>
                   </div>
 
-                  <button onClick={(e) => handleBookNow(e, pg.id || pg.pgId)} className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95">
+                  <button onClick={(e) => handleBookNow(e, pg)} className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all active:scale-95">
                     Book Now
                   </button>
                 </div>
@@ -158,6 +163,15 @@ const Wishlist = () => {
           })}
         </div>
       )}
+
+      <BookingModal 
+        isOpen={isBookingModalOpen} 
+        onClose={() => { setIsBookingModalOpen(false); setSelectedPGForBooking(null); }} 
+        pgId={selectedPGForBooking?.id || selectedPGForBooking?.pgId} 
+        pgName={selectedPGForBooking?.name} 
+        price={selectedPGForBooking?.pricePerBed?.parsedValue ?? selectedPGForBooking?.pricePerBed}
+        typeStr={selectedPGForBooking?.pgType === "MALE_ONLY" ? "Male Only" : selectedPGForBooking?.pgType === "FEMALE_ONLY" ? "Female Only" : "Unisex"}
+      />
     </div>
   );
 };

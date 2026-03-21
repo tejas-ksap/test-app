@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import WishlistButton from "../../components/common/WishlistButton";
 import ReviewSection from "../../components/common/ReviewSection";
+import { PiArrowLeft, PiMapPinFill, PiStarFill, PiWifiHigh, PiSnowflake, PiWashingMachine, PiBarbell, PiShieldCheck, PiCookingPot, PiCaretRight, PiCaretLeft, PiX } from "react-icons/pi";
 
 const PgDetails = () => {
   const { id } = useParams();
@@ -51,13 +52,44 @@ const PgDetails = () => {
     fetchPg();
   }, [id]);
 
-  const handleBookNow = () => {
+  const handleBookNow = async () => {
     if (!user) {
       toast.error("Please login to book a PG.");
       navigate("/login");
       return;
     }
-    toast.success("Booking request sent!");
+
+    if (!bookingData.moveInDate) {
+      toast.error("Please select a move-in date.");
+      return;
+    }
+
+    try {
+      const start = new Date(bookingData.moveInDate);
+      if (isNaN(start.getTime())) {
+        toast.error("Invalid move-in date format.");
+        return;
+      }
+      
+      const durationMonths = parseInt(bookingData.duration.split(" ")[0]);
+      const end = new Date(start);
+      end.setMonth(end.getMonth() + durationMonths);
+
+      const bookingPayload = {
+        userId: user.userid || user.id,
+        pgId: id,
+        startDate: start.toISOString().substring(0, 19),
+        endDate: end.toISOString().substring(0, 19),
+        bookingDate: new Date().toISOString().substring(0, 19),
+        status: "PENDING"
+      };
+
+      await api.post("/api/bookings", bookingPayload);
+      toast.success("Booking request sent successfully!");
+    } catch (err) {
+      console.error("Booking error:", err);
+      toast.error(err.response?.data?.message || "Failed to process booking request.");
+    }
   };
 
   if (loading) {
@@ -90,7 +122,7 @@ const PgDetails = () => {
             onClick={() => navigate(-1)}
             className="flex items-center text-gray-600 hover:text-gray-900 transition font-medium"
           >
-            <span className="material-icons-outlined mr-2">arrow_back</span>
+            <PiArrowLeft className="text-xl mr-2" />
             Back
           </button>
         </div>
@@ -103,12 +135,12 @@ const PgDetails = () => {
             </h1>
             <div className="flex flex-wrap items-center gap-y-2 text-gray-600 dark:text-gray-400">
               <div className="flex items-center">
-                <span className="material-icons-outlined text-[#5A45FF] mr-1.5 text-xl">place</span>
+                <PiMapPinFill className="text-[#5A45FF] mr-1.5 text-2xl" />
                 <span className="text-base font-medium">{pg.address}, {pg.city}</span>
               </div>
               <span className="hidden md:inline mx-3 text-gray-300">•</span>
               <div className="flex items-center">
-                <span className="material-icons text-yellow-400 mr-1.5">star</span>
+                <PiStarFill className="text-yellow-400 text-xl mr-1.5" />
                 <span className="font-bold text-gray-900 dark:text-white mr-1">{pg.rating?.parsedValue ?? pg.rating ?? "4.8"}</span>
                 <span className="text-sm">(120 reviews)</span>
               </div>
@@ -179,43 +211,43 @@ const PgDetails = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">wifi</span>
+                    <PiWifiHigh className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">High-speed Wifi</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">ac_unit</span>
+                    <PiSnowflake className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">Air Conditioning</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">local_laundry_service</span>
+                    <PiWashingMachine className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">On-site Laundry</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">fitness_center</span>
+                    <PiBarbell className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">Gym Access</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">security</span>
+                    <PiShieldCheck className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">24/7 Security</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">countertops</span>
+                    <PiCookingPot className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">Shared Kitchen</span>
                 </div>
               </div>
               <button className="mt-8 text-[#5A45FF] font-bold text-sm tracking-wide uppercase flex items-center hover:opacity-80 transition-opacity">
-                Show all 24 amenities <span className="material-icons-outlined ml-1.5 text-sm">chevron_right</span>
+                Show all 24 amenities <PiCaretRight className="ml-1 text-lg" />
               </button>
             </div>
 
@@ -269,8 +301,8 @@ const PgDetails = () => {
                   <p className="text-sm text-gray-500 mb-1">Starting from</p>
                   <p className="text-4xl font-extrabold text-gray-900 dark:text-white">₹{price.toLocaleString()}<span className="text-lg text-gray-400 font-medium"> / mo</span></p>
                 </div>
-                <div className="flex items-center gap-1.5 bg-yellow-50 px-2 py-1 rounded-lg">
-                  <span className="material-icons text-yellow-500 text-sm">star</span>
+                <div className="flex items-center gap-1.5 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
+                  <PiStarFill className="text-yellow-500 text-lg" />
                   <span className="text-sm font-bold text-yellow-700">{pg.rating?.parsedValue ?? pg.rating ?? "4.8"}</span>
                 </div>
               </div>
@@ -362,7 +394,7 @@ const PgDetails = () => {
                 onClick={() => setShowGallery(false)}
                 className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 transition"
               >
-                <span className="material-icons-outlined text-xl">close</span>
+                <PiX className="text-2xl" />
               </button>
             </div>
 
@@ -375,7 +407,7 @@ const PgDetails = () => {
                 disabled={galleryIndex === 0}
                 className={`absolute left-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black flex items-center justify-center text-gray-800 dark:text-white transition z-20 border border-gray-200 dark:border-white/10 shadow-sm ${galleryIndex === 0 ? 'opacity-30 cursor-not-allowed hidden md:flex' : 'opacity-0 group-hover:opacity-100'} -translate-x-2 group-hover:translate-x-0`}
               >
-                <span className="material-icons-outlined">chevron_left</span>
+                <PiCaretLeft className="text-2xl" />
               </button>
               
               {/* Spotlight Image */}
@@ -395,7 +427,7 @@ const PgDetails = () => {
                 disabled={galleryIndex === pg.images.length - 1}
                 className={`absolute right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black flex items-center justify-center text-gray-800 dark:text-white transition z-20 border border-gray-200 dark:border-white/10 shadow-sm ${galleryIndex === pg.images.length - 1 ? 'opacity-30 cursor-not-allowed hidden md:flex' : 'opacity-0 group-hover:opacity-100'} translate-x-2 group-hover:translate-x-0`}
               >
-                <span className="material-icons-outlined">chevron_right</span>
+                <PiCaretRight className="text-2xl" />
               </button>
             </div>
 
