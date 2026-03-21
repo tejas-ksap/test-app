@@ -12,6 +12,7 @@ const ReviewSection = ({ pgId }) => {
   const [submitting, setSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingReviewId, setEditingReviewId] = useState(null);
+  const [hasBooked, setHasBooked] = useState(false);
 
   const existingReview = user ? reviews.find(r => r.userId === (user.userid || user.id)) : null;
 
@@ -28,7 +29,19 @@ const ReviewSection = ({ pgId }) => {
 
   useEffect(() => {
     if (pgId) fetchReviews();
-  }, [pgId]);
+
+    const fetchUserBookingStatus = async () => {
+      if (!user) return;
+      try {
+        const res = await api.get(`/api/bookings/user/${user.userid || user.id}`);
+        const userHasBooked = res.data.some(b => String(b.pgId) === String(pgId) && b.status !== 'REJECTED' && b.status !== 'CANCELLED');
+        setHasBooked(userHasBooked);
+      } catch (err) {
+        console.error("Failed to check booking status", err);
+      }
+    };
+    fetchUserBookingStatus();
+  }, [pgId, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -139,7 +152,7 @@ const ReviewSection = ({ pgId }) => {
       </div>
 
       {/* Add / Edit Review Form */}
-      {user && (!existingReview || isEditing) && (
+      {user && hasBooked && (!existingReview || isEditing) && (
         <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold dark:text-white">
