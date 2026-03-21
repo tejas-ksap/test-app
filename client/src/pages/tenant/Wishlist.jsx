@@ -46,7 +46,7 @@ const Wishlist = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-main)] min-h-full rounded-2xl p-6 lg:p-10 text-[var(--text-main)] transition-colors duration-300">
+    <div className="bg-[var(--bg-main)] min-h-full rounded-2xl lg:px-10 text-[var(--text-main)] transition-colors duration-300">
       <div className="mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent">
           My Wishlist

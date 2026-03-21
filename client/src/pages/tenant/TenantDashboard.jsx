@@ -7,7 +7,7 @@ const TenantDashboard = () => {
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen text-slate-800 dark:text-slate-300 antialiased selection:bg-primary selection:text-white pb-12">
-      <main className="max-w-7xl mx-auto p-6 lg:p-8 space-y-8">
+      <main className="max-w-7xl mx-auto p-6 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white tracking-tight">
