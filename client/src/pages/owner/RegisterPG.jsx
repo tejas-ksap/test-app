@@ -159,8 +159,8 @@ const RegisterPG = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="mx-auto py-8 animate-in fade-in duration-500">
+      <div className="mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{isEditMode ? "Edit Property details" : "Register New Property"}</h1>
           <p className="mt-2 text-gray-500 dark:text-gray-400">{isEditMode ? "Tweak your listing information instantly." : "List your accommodation and start managing tenants seamlessly."}</p>
@@ -513,23 +513,25 @@ const RegisterPG = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-5 bg-[#5A45FF] hover:bg-[#4633e6] disabled:bg-gray-400 text-white rounded-[1.5rem] font-bold text-xl shadow-xl shadow-[#5A45FF]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-                {isEditMode ? "Saving Changes..." : "Registering..."}
-              </>
-            ) : (
-              <>
-                <span className="material-icons-outlined">{isEditMode ? "save" : "add_business"}</span>
-                {isEditMode ? "Save Changes" : "Submit Registration"}
-              </>
-            )}
-          </button>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-12 py-3 bg-[#5A45FF] hover:bg-[#4633e6] disabled:bg-gray-400 text-white rounded-[1.5rem] font-bold text-xl shadow-xl shadow-[#5A45FF]/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                  {isEditMode ? "Saving Changes..." : "Registering..."}
+                </>
+              ) : (
+                <>
+                  <span className="material-icons-outlined">{isEditMode ? "save" : "add_business"}</span>
+                  {isEditMode ? "Submit Registration" : "Submit Registration"}
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
