@@ -68,6 +68,7 @@ const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <OwnerDashboard /> },
           { path: "register-pg", element: <RegisterPG /> },
+          { path: "edit-pg/:id", element: <RegisterPG /> },
           { path: "pg-list", element: <ViewListedPGs /> },
           { path: "tenants", element: <OwnerTenants /> },
           { path: "profile", element: <Profile /> },

@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const RegisterPG = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = !!id;
   const { user } = useAuth();
+  
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -31,9 +34,52 @@ const RegisterPG = () => {
     images: [],
   });
 
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditMode);
+
+  React.useEffect(() => {
+    if (isEditMode) {
+      const fetchProperty = async () => {
+        try {
+          const res = await api.get(`/api/pg-properties/${id}`);
+          const pg = res.data;
+          setFormData({
+            name: pg.name || "",
+            address: pg.address || "",
+            city: pg.city || "",
+            state: pg.state || "",
+            pincode: pg.pincode || "",
+            landmark: pg.landmark || "",
+            latitude: pg.latitude || "",
+            longitude: pg.longitude || "",
+            description: pg.description || "",
+            totalRooms: pg.totalRooms || "",
+            availableRooms: pg.availableRooms || "",
+            pricePerBed: pg.pricePerBed || "",
+            depositAmount: pg.depositAmount || "",
+            foodIncluded: pg.foodIncluded || false,
+            acAvailable: pg.acAvailable || false,
+            wifiAvailable: pg.wifiAvailable || false,
+            laundryAvailable: pg.laundryAvailable || false,
+            pgType: pg.pgType || "",
+            rating: pg.rating || "",
+            verified: pg.verified || false,
+            ownerId: pg.ownerId || user?.userid || "",
+            images: pg.images || [],
+          });
+        } catch (err) {
+          console.error("Failed to fetch property details", err);
+          setError("Failed to load PG property for editing.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchProperty();
+    }
+  }, [id, isEditMode, user?.userid]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -45,27 +91,10 @@ const RegisterPG = () => {
 
   const [uploadingImages, setUploadingImages] = useState(false);
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (!files || files.length === 0) return;
-    
-    setUploadingImages(true);
-    try {
-      const uploadedImageKeys = await Promise.all(
-        files.map(async (file) => {
-          const uploadData = new FormData();
-          uploadData.append("file", file);
-          const res = await api.post("/api/users/images/upload", uploadData);
-          return res.data.imageKey;
-        })
-      );
-      setFormData((prev) => ({ ...prev, images: [...prev.images, ...uploadedImageKeys] }));
-    } catch (err) {
-      console.error("Error uploading files", err);
-      setError("Failed to upload exactly one or more images.");
-    } finally {
-      setUploadingImages(false);
-    }
+    setSelectedFiles((prev) => [...prev, ...files]);
   };
 
   const handleSubmit = async (e) => {
@@ -81,6 +110,16 @@ const RegisterPG = () => {
     }
 
     try {
+      setUploadingImages(true);
+      const uploadedImageKeys = await Promise.all(
+        selectedFiles.map(async (file) => {
+          const uploadData = new FormData();
+          uploadData.append("file", file);
+          const res = await api.post("/api/users/images/upload", uploadData);
+          return res.data.imageKey;
+        })
+      );
+
       const payload = {
         ...formData,
         ownerId: user?.userid,
@@ -91,25 +130,40 @@ const RegisterPG = () => {
         pricePerBed: parseFloat(formData.pricePerBed),
         depositAmount: parseFloat(formData.depositAmount),
         rating: parseFloat(formData.rating || 0),
+        images: [...(formData.images || []), ...uploadedImageKeys],
       };
 
-      await api.post("/api/pg-properties", payload);
-      setSuccess("PG Registered Successfully!");
-      setTimeout(() => navigate("/owner/dashboard"), 1500);
+      if (isEditMode) {
+        await api.put(`/api/pg-properties/${id}`, payload);
+        setSuccess("PG Updated Successfully!");
+      } else {
+        await api.post("/api/pg-properties", payload);
+        setSuccess("PG Registered Successfully!");
+      }
+      setTimeout(() => navigate("/owner/pg-list"), 1500);
     } catch (err) {
       console.error(err);
       setError("Failed to register PG. Check all fields.");
     } finally {
+      setUploadingImages(false);
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#5A45FF]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Register New Property</h1>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">List your accommodation and start managing tenants seamlessly.</p>
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{isEditMode ? "Edit Property details" : "Register New Property"}</h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">{isEditMode ? "Tweak your listing information instantly." : "List your accommodation and start managing tenants seamlessly."}</p>
         </div>
 
         {error && (
@@ -419,19 +473,39 @@ const RegisterPG = () => {
                 <p className="text-gray-500 dark:text-gray-400 mt-1">Or click to browse from your computer (Max 10 photos)</p>
               </div>
 
-              {formData.images.length > 0 && (
+              {/* Render Pre-existing Server Images */}
+              {formData.images && formData.images.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                  {formData.images.slice(0, 6).map((img, idx) => (
-                    <div key={idx} className="aspect-square rounded-xl overflow-hidden shadow-sm relative group">
-                      <img src={img.startsWith('http') ? img : `${api.defaults.baseURL}/api/users/images/${img}`} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                  {formData.images.map((img, idx) => (
+                    <div key={`existing-${idx}`} className="aspect-square rounded-xl overflow-hidden shadow-sm relative group border-2 border-[#5A45FF]/30">
+                      <img src={img.startsWith('http') ? img : `${api.defaults.baseURL}/api/users/images/${img}`} alt={`Preview existing ${idx}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="material-icons text-white cursor-pointer">delete</span>
+                        <span 
+                          className="material-icons text-white cursor-pointer hover:text-red-400 drop-shadow-md"
+                          onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))}
+                        >delete</span>
                       </div>
                     </div>
                   ))}
-                  {formData.images.length > 6 && (
+                </div>
+              )}
+
+              {selectedFiles.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                  {selectedFiles.slice(0, 6).map((file, idx) => (
+                    <div key={idx} className="aspect-square rounded-xl overflow-hidden shadow-sm relative group">
+                      <img src={URL.createObjectURL(file)} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span 
+                          className="material-icons text-white cursor-pointer"
+                          onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== idx))}
+                        >delete</span>
+                      </div>
+                    </div>
+                  ))}
+                  {selectedFiles.length > 6 && (
                     <div className="aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 font-bold border-2 border-dashed border-gray-200">
-                      +{formData.images.length - 6} more
+                      +{selectedFiles.length - 6} more
                     </div>
                   )}
                 </div>
@@ -447,12 +521,12 @@ const RegisterPG = () => {
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-                Registering...
+                {isEditMode ? "Saving Changes..." : "Registering..."}
               </>
             ) : (
               <>
-                <span className="material-icons-outlined">add_business</span>
-                Submit Registration
+                <span className="material-icons-outlined">{isEditMode ? "save" : "add_business"}</span>
+                {isEditMode ? "Save Changes" : "Submit Registration"}
               </>
             )}
           </button>
