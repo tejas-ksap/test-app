@@ -2,6 +2,7 @@ package com.pgaccomodation.bookingservice.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -64,6 +65,10 @@ public class PgProperty {
 
 	private BigDecimal rating;
 	private Boolean verified;
+
+	@jakarta.persistence.Convert(converter = StringListConverter.class)
+	@Column(name = "images", columnDefinition = "TEXT")
+	private List<String> images;
 
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;

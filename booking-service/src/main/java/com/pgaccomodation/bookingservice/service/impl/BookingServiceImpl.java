@@ -142,6 +142,7 @@ public class BookingServiceImpl implements BookingService {
 	            pgDto.setPgType(pg.getPgType().name());
 	            pgDto.setRating(pg.getRating());
 	            pgDto.setVerified(pg.getVerified());
+	            pgDto.setImages(pg.getImages());
 	            pgDto.setCreatedAt(pg.getCreatedAt());
 	            pgDto.setUpdatedAt(pg.getUpdatedAt());
 

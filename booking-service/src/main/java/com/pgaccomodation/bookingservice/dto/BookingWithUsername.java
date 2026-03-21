@@ -4,6 +4,9 @@ public interface BookingWithUsername {
     Integer getId();
     Integer getUserId();
     String getUsername(); // from users table
+    String getFullName();
+    String getEmail();
+    String getPhone();
     Integer getPgId();
     String getStatus();
     java.time.LocalDateTime getStartDate();
