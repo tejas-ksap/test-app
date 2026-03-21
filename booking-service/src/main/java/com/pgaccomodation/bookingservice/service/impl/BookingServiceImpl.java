@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.pgaccomodation.bookingservice.dto.BookingResponseDTO;
 import com.pgaccomodation.bookingservice.dto.BookingWithUsername;
@@ -27,7 +26,6 @@ public class BookingServiceImpl implements BookingService {
 
 	private final BookingRepository bookingRepository;
 	private final PgPropertyRepository pgPropertyRepository; // ✅ MUST BE FINAL
-	private final RestTemplate restTemplate;
 
 	@Override
 	public Booking createBooking(Booking booking) {

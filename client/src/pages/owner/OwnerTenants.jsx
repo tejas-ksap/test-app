@@ -151,150 +151,168 @@ const OwnerTenants = () => {
   }
 
   return (
-    <div className="mx-auto">
-      {/* Search & Actions Bar */}
-      <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-96">
-          <PiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+    <div className="min-h-screen bg-transparent animate-in fade-in duration-700">
+      <div className="max-w-7xl mx-auto space-y-8 pb-12">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">Your Tenants</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Manage your property residents and their stays.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-white dark:bg-gray-900/50 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 backdrop-blur-sm">
+            <div className="px-5 py-2 text-center border-r border-gray-100 dark:border-gray-800">
+              <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Total</p>
+              <p className="text-xl font-black text-[#5A45FF] dark:text-[#7C6CFF]">{bookings.length}</p>
+            </div>
+            <div className="px-5 py-2 text-center">
+              <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Active</p>
+              <p className="text-xl font-black text-emerald-500 dark:text-emerald-400">
+                {bookings.filter(b => b.status === "CONFIRMED").length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative group">
+          <PiMagnifyingGlass className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#5A45FF] transition-colors" size={24} />
           <input
             type="text"
             placeholder="Search by name, PG, or email..."
-            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/20 focus:border-[#5A45FF] transition-all shadow-sm"
+            className="w-full pl-16 pr-6 py-5 bg-white dark:bg-gray-900/80 border-none rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-none focus:ring-2 focus:ring-[#5A45FF]/50 transition-all text-lg dark:text-white dark:placeholder-gray-500 backdrop-blur-md"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex gap-2 text-sm text-gray-500 font-medium bg-gray-50 p-1.5 rounded-xl border border-gray-100">
-           <span className="px-3 py-1.5 bg-white rounded-lg shadow-sm border border-gray-100 text-[#5A45FF]">
-             Total: {bookings.length}
-           </span>
-           <span className="px-3 py-1.5">
-             Active: {bookings.filter(b => b.status === "CONFIRMED").length}
-           </span>
-        </div>
-      </div>
 
-      {error ? (
-        <div className="bg-rose-50 border border-rose-100 p-8 rounded-3xl text-center">
-          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-             <PiXCircle className="text-3xl text-rose-600" />
+        {/* Content Area */}
+        {error ? (
+          <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/20 p-12 rounded-[3rem] text-center">
+            <PiXCircle size={64} className="text-rose-500 mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Oops! Something went wrong</h3>
+            <p className="text-rose-600 dark:text-rose-400 font-medium mb-8 max-w-md mx-auto">{error}</p>
+            <button 
+              onClick={fetchTenants}
+              className="px-8 py-3 bg-rose-500 text-white rounded-2xl font-bold hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/25 active:scale-95"
+            >
+              Try Again
+            </button>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Oops! Something went wrong</h3>
-          <p className="text-rose-600 mb-6 max-w-md mx-auto">{error}</p>
-          <button 
-            onClick={fetchTenants}
-            className="px-6 py-2.5 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors shadow-lg shadow-rose-600/20 font-medium"
-          >
-            Try Again
-          </button>
-        </div>
-      ) : filteredBookings.length === 0 ? (
-        <div className="bg-gray-50 border border-dashed border-gray-200 p-16 rounded-3xl text-center">
-           <PiUser className="text-5xl text-gray-300 mx-auto mb-4" />
-           <p className="text-gray-500 font-medium italic">
-             {search ? "No tenants matching your search." : "You don't have any tenants yet."}
-           </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {filteredBookings.map((b) => (
-            <div key={b.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 group overflow-hidden flex flex-col md:flex-row">
-              {/* Tenant Initials / Profile Marker */}
-              <div className="w-full md:w-32 bg-gray-50 flex items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 p-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                  {b.fullName ? b.fullName.charAt(0).toUpperCase() : b.username?.charAt(0).toUpperCase()}
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="flex-1 p-6 flex flex-col lg:flex-row justify-between gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-xl font-bold text-gray-900">{b.fullName || b.username}</h3>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${getStatusColor(b.status)}`}>
-                        {getStatusIcon(b.status)}
-                        {b.status}
-                      </span>
+        ) : filteredBookings.length === 0 ? (
+          <div className="bg-gray-50/50 dark:bg-gray-900/30 border-2 border-dashed border-gray-200 dark:border-gray-800 p-20 rounded-[3rem] text-center backdrop-blur-sm">
+            <PiUser size={80} className="text-gray-200 dark:text-gray-800 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">No tenants found</h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Try adjusting your search or filters.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-8">
+            {filteredBookings.map((b) => (
+              <div 
+                key={b.id} 
+                className="group relative bg-white dark:bg-gray-900/90 rounded-[3rem] p-8 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-500 border border-gray-100 dark:border-gray-800 backdrop-blur-md"
+              >
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-10">
+                  {/* Left: Avatar & Basic Info */}
+                  <div className="flex items-center gap-6 min-w-[320px]">
+                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-[#5A45FF]/30 group-hover:rotate-6 transition-transform">
+                      {b.fullName?.charAt(0) || b.username?.charAt(0) || "U"}
                     </div>
-                    <div className="flex items-center text-gray-500 text-sm gap-4">
-                      <span className="flex items-center gap-1.5 italic">
-                        <PiUser className="text-base" /> @{b.username}
-                      </span>
-                      <span className="flex items-center gap-1.5 text-[#5A45FF] font-medium">
-                        <PiHouse className="text-base" /> {b.pgName}
-                      </span>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{b.fullName || b.username}</h3>
+                        <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.15em] ${
+                          b.status === "CONFIRMED" ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : 
+                          "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400"
+                        }`}>
+                          {b.status}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-medium italic">
+                          <PiUser size={18} />
+                          <span>@{b.username}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[#5A45FF] dark:text-[#8E7DFF] font-black uppercase text-[11px] tracking-wider">
+                          <PiHouse size={18} weight="fill" />
+                          <span>{b.pgName}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    <a href={`tel:${b.phone}`} className="flex items-center gap-2 text-gray-600 hover:text-[#5A45FF] transition-colors bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                      <PiPhone className="text-lg text-[#5A45FF]" /> {b.phone || "No phone"}
+                  {/* Middle: Contact Info */}
+                  <div className="flex flex-wrap gap-4 py-6 lg:py-0 border-y lg:border-y-0 lg:border-x border-gray-100 dark:border-gray-800 lg:px-10 flex-1">
+                    <a href={`tel:${b.phone}`} className="flex items-center gap-3 px-5 py-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-[#5A45FF]/10 dark:hover:bg-[#5A45FF]/20 text-gray-700 dark:text-gray-300 hover:text-[#5A45FF] dark:hover:text-[#8E7DFF] transition-all rounded-2xl font-bold border border-transparent hover:border-[#5A45FF]/20">
+                      <PiPhone size={22} weight="fill" className="text-[#5A45FF]" />
+                      <span>{b.phone || "No phone"}</span>
                     </a>
-                    <a href={`mailto:${b.email}`} className="flex items-center gap-2 text-gray-600 hover:text-[#5A45FF] transition-colors bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                      <PiEnvelope className="text-lg text-[#5A45FF]" /> {b.email || "No email"}
+                    <a href={`mailto:${b.email}`} className="flex items-center gap-3 px-5 py-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-[#5A45FF]/10 dark:hover:bg-[#5A45FF]/20 text-gray-700 dark:text-gray-300 hover:text-[#5A45FF] dark:hover:text-[#8E7DFF] transition-all rounded-2xl font-bold border border-transparent hover:border-[#5A45FF]/20">
+                      <PiEnvelope size={22} weight="fill" className="text-[#5A45FF]" />
+                      <span>{b.email || "No email"}</span>
                     </a>
                   </div>
-                </div>
 
-                <div className="flex flex-col sm:flex-row items-start lg:items-center gap-8 lg:border-l border-gray-100 lg:pl-8">
-                  <div className="space-y-3 min-w-[180px]">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                        <PiCalendarBlank className="text-xl" />
+                  {/* Right: Stay Details & Actions */}
+                  <div className="flex flex-col sm:flex-row items-center gap-10 w-full lg:w-auto">
+                    <div className="space-y-5 min-w-[200px]">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm">
+                          <PiCalendarBlank size={24} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Stay Period</p>
+                          <p className="text-gray-900 dark:text-gray-200 font-black">
+                            {new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Stay Period</p>
-                        <p className="text-sm font-bold text-gray-700">
-                          {new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}
-                        </p>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-sm">
+                          <PiTimer size={24} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Duration</p>
+                          <p className="text-gray-900 dark:text-gray-200 font-black tracking-tight">{calculateMonths(b.startDate, b.endDate)} Months</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
-                        <PiTimer className="text-xl" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Stay Duration</p>
-                        <p className="text-sm font-bold text-gray-700">
-                           {calculateMonths(b.startDate, b.endDate)} months
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Status Action */}
-                  <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100 flex flex-col gap-2 w-full sm:w-auto">
-                    <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold px-1">Quick Action</p>
-                    <div className="flex gap-2">
-                       <select 
-                         value={selectedStatus[b.id] || b.status}
-                         onChange={(e) => setSelectedStatus(prev => ({ ...prev, [b.id]: e.target.value }))}
-                         className="bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-sm font-medium focus:ring-2 focus:ring-[#5A45FF]/20 focus:border-[#5A45FF] outline-none"
-                       >
-                         <option value="PENDING">PENDING</option>
-                         <option value="CONFIRMED">CONFIRMED</option>
-                         <option value="CANCELLED">CANCELLED</option>
-                       </select>
-                       <button 
-                        onClick={() => handleUpdateStatus(b.id, selectedStatus[b.id] || b.status)}
-                        disabled={ (selectedStatus[b.id] || b.status) === b.status }
-                        className={`p-2 rounded-xl transition-all shadow-sm ${
-                          (selectedStatus[b.id] || b.status) === b.status 
-                          ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
-                          : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-[#5A45FF]/20"
-                        }`}
-                       >
-                         <PiArrowRight className="text-xl" />
-                       </button>
+                    {/* Quick Action */}
+                    <div className="w-full sm:w-auto p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 group/action">
+                      <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Status Action</p>
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <select 
+                            className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl px-5 py-3 pr-12 font-black text-sm focus:ring-4 focus:ring-[#5A45FF]/10 transition-all dark:text-white outline-none cursor-pointer"
+                            value={selectedStatus[b.id] || b.status}
+                            onChange={(e) => setSelectedStatus(prev => ({ ...prev, [b.id]: e.target.value }))}
+                          >
+                            <option value="CONFIRMED">CONFIRMED</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                          </select>
+                          <PiArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-90" size={14} />
+                        </div>
+                        <button 
+                          onClick={() => handleUpdateStatus(b.id, selectedStatus[b.id] || b.status)}
+                          disabled={(selectedStatus[b.id] || b.status) === b.status}
+                          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                            (selectedStatus[b.id] || b.status) === b.status 
+                            ? "bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed" 
+                            : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-lg shadow-[#5A45FF]/30 active:scale-90"
+                          }`}
+                        >
+                          <PiArrowRight size={20} weight="black" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

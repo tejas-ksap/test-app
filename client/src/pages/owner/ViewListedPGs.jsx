@@ -40,15 +40,34 @@ const ViewPGs = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6 text-[var(--text-main)]">📄 Your PG Listings</h1>
+    <div className="min-h-screen bg-transparent animate-in fade-in duration-700 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div>
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">Your PG Listings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Manage and update your property details.</p>
+        </div>
+        <button 
+          onClick={() => navigate("/owner/register-pg")}
+          className="flex items-center gap-2 px-6 py-3 bg-[#5A45FF] text-white rounded-2xl font-bold hover:bg-[#4633e6] transition-all shadow-lg shadow-[#5A45FF]/20 active:scale-95"
+        >
+          <span className="material-icons-outlined">add</span>
+          Add New Property
+        </button>
+      </div>
 
       {loading ? (
-        <p className="text-[var(--text-muted)]">Loading...</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-80 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-[2.5rem]" />
+          ))}
+        </div>
       ) : error ? (
-        <p className="text-red-500 font-medium">{error}</p>
+        <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/20 p-12 rounded-[3rem] text-center">
+          <p className="text-rose-600 dark:text-rose-400 font-bold text-xl mb-4">{error}</p>
+          <button onClick={() => window.location.reload()} className="px-8 py-3 bg-rose-500 text-white rounded-2xl font-bold">Retry</button>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {pgs.map((pg) => (
             <div key={pg.pgId} className="flex flex-col group h-full">
               <PGCard
@@ -59,20 +78,20 @@ const ViewPGs = () => {
                 rating={pg.rating?.parsedValue ?? pg.rating ?? "New"}
                 image={pg.images?.[0]}
               >
-                <div className="flex gap-3 justify-between items-center w-full">
+                <div className="flex flex-col gap-3 w-full">
                   <button 
                     onClick={() => navigate(`/owner/edit-pg/${pg.pgId}`)}
-                    className="w-full flex items-center justify-center gap-2 bg-[#5A45FF]/10 text-[#5A45FF] hover:bg-[#5A45FF]/20 px-4 py-2.5 rounded-lg font-bold transition-all text-sm"
+                    className="w-full flex items-center justify-center gap-2 bg-[#5A45FF]/10 dark:bg-[#5A45FF]/20 text-[#5A45FF] dark:text-[#8E7DFF] hover:bg-[#5A45FF]/20 dark:hover:bg-[#5A45FF]/30 px-4 py-3 rounded-xl font-black transition-all text-sm uppercase tracking-wider"
                   >
                     <span className="material-icons-outlined text-[18px]">edit</span>
-                    Edit
+                    Edit Details
                   </button>
                   <button 
                     onClick={() => setDeleteTarget(pg.pgId)}
-                    className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-lg font-bold transition-all text-sm"
+                    className="w-full flex items-center justify-center gap-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 px-4 py-3 rounded-xl font-black transition-all text-sm uppercase tracking-wider"
                   >
                     <span className="material-icons-outlined text-[18px]">delete</span>
-                    Delete
+                    Remove PG
                   </button>
                 </div>
               </PGCard>
