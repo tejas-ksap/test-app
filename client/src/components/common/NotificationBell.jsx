@@ -41,13 +41,13 @@ const NotificationBell = () => {
     e.stopPropagation();
     try {
       await api.put(`/api/users/${user.userid}/notifications/${id}/read`);
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
     } catch (err) {
       console.error("Failed to mark notification as read", err);
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   if (!user) return null;
 
@@ -89,18 +89,18 @@ const NotificationBell = () => {
               notifications.map(notification => (
                 <div 
                   key={notification.id} 
-                  className={`p-4 border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex gap-3 ${!notification.read ? 'bg-[#5A45FF]/5 dark:bg-[#5A45FF]/10' : ''}`}
+                  className={`p-4 border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex gap-3 ${!notification.isRead ? 'bg-[#5A45FF]/5 dark:bg-[#5A45FF]/10' : ''}`}
                 >
-                  <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${!notification.read ? 'bg-[#5A45FF]' : 'bg-transparent'}`}></div>
+                  <div className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${!notification.isRead ? 'bg-[#5A45FF]' : 'bg-transparent'}`}></div>
                   <div className="flex-1">
-                    <p className={`text-sm ${!notification.read ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+                    <p className={`text-sm ${!notification.isRead ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>
                       {notification.message}
                     </p>
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-xs text-gray-400">
                         {new Date(notification.createdAt).toLocaleDateString()} at {new Date(notification.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </span>
-                      {!notification.read && (
+                      {!notification.isRead && (
                         <button 
                           onClick={(e) => markAsRead(notification.id, e)}
                           className="text-xs text-[#5A45FF] hover:underline"

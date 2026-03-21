@@ -21,6 +21,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     	        u.full_name AS fullName,
     	        u.email AS email,
     	        u.phone AS phone,
+    	        u.profile_pic AS profileImage,
     	        b.pg_id AS pgId,
     	        b.status,
     	        b.start_date AS startDate,

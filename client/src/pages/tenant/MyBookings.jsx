@@ -123,7 +123,7 @@ const MyBookings = () => {
                                    <span className="truncate">{b.pg?.address ? `${b.pg.address}, ${b.pg.city}` : 'N/A'}</span>
                                  </p>
                               </div>
-                              <div className={`px-3 py-1 text-[8px] font-black rounded-full uppercase tracking-widest flex items-center shrink-0 border ${statusColor(b.status)} border-current/10 shadow-sm`}>
+                              <div className={`px-3 py-1 text-[10px] font-black rounded-full uppercase tracking-widest flex items-center shrink-0 border ${statusColor(b.status)} border-current/10 shadow-sm`}>
                                  {b.status}
                               </div>
                            </div>
@@ -161,7 +161,7 @@ const MyBookings = () => {
                                  onClick={(e) => { e.stopPropagation(); handleCancel(b.id); }}
                                  className="px-5 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-rose-600 hover:text-white transition-all border border-rose-100 dark:border-rose-900/30 active:scale-95 flex items-center gap-2"
                                >
-                                  <PiXBold size={14} /> Cancel Booking
+                                  <PiXBold size={16} /> Cancel Booking
                                </button>
                            )}
                        </div>

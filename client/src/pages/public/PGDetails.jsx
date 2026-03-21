@@ -71,13 +71,13 @@ const PgDetails = () => {
         return;
       }
       
-      const durationMonths = parseInt(bookingData.duration.split(" ")[0]);
+      const durationNum = parseInt(bookingData.duration.split(" ")[0]);
       const end = new Date(start);
-      end.setMonth(end.getMonth() + durationMonths);
+      end.setMonth(end.getMonth() + durationNum);
 
       const bookingPayload = {
         userId: user.userid || user.id,
-        pgId: id,
+        pgId: parseInt(id),
         startDate: start.toISOString().substring(0, 19),
         endDate: end.toISOString().substring(0, 19),
         bookingDate: new Date().toISOString().substring(0, 19),
@@ -359,8 +359,8 @@ const PgDetails = () => {
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span className="underline cursor-help">Rent x 1 month</span>
-                  <span>₹{price.toLocaleString()}</span>
+                  <span className="underline cursor-help">Rent x {bookingData.duration}</span>
+                  <span>₹{(price * parseInt(bookingData.duration.split(" ")[0])).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span className="underline cursor-help">Service fee</span>
@@ -368,7 +368,7 @@ const PgDetails = () => {
                 </div>
                 <div className="flex justify-between text-base font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-50 dark:border-gray-800">
                   <span>Total (INR)</span>
-                  <span>₹{price.toLocaleString()}</span>
+                  <span>₹{(price * parseInt(bookingData.duration.split(" ")[0])).toLocaleString()}</span>
                 </div>
               </div>
             </div>

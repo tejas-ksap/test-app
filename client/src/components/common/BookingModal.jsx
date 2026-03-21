@@ -42,7 +42,7 @@ const BookingModal = ({ isOpen, onClose, pgId, pgName, price, typeStr }) => {
 
       const bookingPayload = {
         userId: user.userid || user.id,
-        pgId: pgId,
+        pgId: parseInt(pgId),
         startDate: start.toISOString().substring(0, 19),
         endDate: end.toISOString().substring(0, 19),
         bookingDate: new Date().toISOString().substring(0, 19),

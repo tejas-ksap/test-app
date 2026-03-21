@@ -17,21 +17,35 @@ import com.pgaccomodation.bookingservice.exception.UnauthorizedAccessException;
 import com.pgaccomodation.bookingservice.repository.BookingRepository;
 import com.pgaccomodation.bookingservice.repository.PgPropertyRepository;
 import com.pgaccomodation.bookingservice.service.BookingService;
+import com.pgaccomodation.bookingservice.client.NotificationClient;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingServiceImpl implements BookingService {
 
 	private final BookingRepository bookingRepository;
-	private final PgPropertyRepository pgPropertyRepository; // ✅ MUST BE FINAL
+	private final PgPropertyRepository pgPropertyRepository;
+	private final NotificationClient notificationClient;
 
 	@Override
 	public Booking createBooking(Booking booking) {
 		booking.setBookingDate(LocalDateTime.now());
 		booking.setStatus("PENDING");
-		return bookingRepository.save(booking);
+		Booking saved = bookingRepository.save(booking);
+
+		// Notify the PG owner about the new booking request
+		pgPropertyRepository.findById(booking.getPgId()).ifPresent(pg -> {
+			String msg = String.format(
+				"New booking request for '%s' (Booking ID: %d). Please review and confirm.",
+				pg.getName(), saved.getId());
+			notificationClient.sendNotification(pg.getOwnerId(), msg);
+		});
+
+		return saved;
 	}
 
 	@Override
@@ -59,6 +73,14 @@ public class BookingServiceImpl implements BookingService {
 		bookingRepository.findById(id).ifPresent(booking -> {
 			booking.setStatus("CANCELLED");
 			bookingRepository.save(booking);
+
+			// Notify the PG owner that a booking was cancelled
+			pgPropertyRepository.findById(booking.getPgId()).ifPresent(pg -> {
+				String msg = String.format(
+					"Booking ID %d for '%s' has been cancelled by the tenant.",
+					id, pg.getName());
+				notificationClient.sendNotification(pg.getOwnerId(), msg);
+			});
 		});
 	}
 
@@ -75,6 +97,14 @@ public class BookingServiceImpl implements BookingService {
 
 		booking.setStatus(status.toUpperCase());
 		bookingRepository.save(booking);
+
+		// Notify the tenant about the status change
+		pgPropertyRepository.findById(booking.getPgId()).ifPresent(pg -> {
+			String msg = String.format(
+				"Your booking for '%s' (ID: %d) has been updated to: %s.",
+				pg.getName(), bookingId, status.toUpperCase());
+			notificationClient.sendNotification(booking.getUserId(), msg);
+		});
 	}
 
 	public List<Booking> getBookingsByPgIdAndOwner(Integer pgId, Integer ownerId) {

@@ -28,9 +28,18 @@ const OwnerTenants = () => {
     if (!start || !end) return 0;
     const startDate = new Date(start);
     const endDate = new Date(end);
-    const diffTime = Math.abs(endDate - startDate);
-    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44));
-    return diffMonths;
+    
+    let months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+    months += endDate.getMonth() - startDate.getMonth();
+    
+    // If the day of the month is less, it's not a full month (but user usually wants rounded up for display)
+    if (endDate.getDate() < startDate.getDate()) {
+       // but for 3/21 to 6/21, it should be exactly 3.
+    }
+    
+    // Alternative: Use diff in days / 30 and round
+    const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+    return Math.round(diffDays / 30.44);
   };
 
   const fetchTenants = async () => {
@@ -209,13 +218,21 @@ const OwnerTenants = () => {
             {filteredBookings.map((b) => (
               <div 
                 key={b.id} 
-                className="group relative bg-white dark:bg-gray-900/90 rounded-[3rem] p-8 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-500 border border-gray-100 dark:border-gray-800 backdrop-blur-md"
+                className="group relative bg-white dark:bg-gray-900/90 rounded-[3rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-500 border border-gray-100 dark:border-gray-800 backdrop-blur-md"
               >
-                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-10">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-1">
                   {/* Left: Avatar & Basic Info */}
                   <div className="flex items-center gap-6 min-w-[320px]">
-                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-[#5A45FF]/30 group-hover:rotate-6 transition-transform">
-                      {b.fullName?.charAt(0) || b.username?.charAt(0) || "U"}
+                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-[#5A45FF]/30 group-hover:rotate-6 transition-transform overflow-hidden">
+                      {b.profileImage ? (
+                        <img 
+                          src={b.profileImage.startsWith('http') ? b.profileImage : `${api.defaults.baseURL}/api/users/images/${b.profileImage}`} 
+                          alt={b.fullName} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        b.fullName?.charAt(0) || b.username?.charAt(0) || "U"
+                      )}
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center gap-3 flex-wrap">
