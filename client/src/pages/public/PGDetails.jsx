@@ -115,7 +115,7 @@ const PgDetails = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-[400px] md:h-[550px] mb-12">
           <div className="md:col-span-8 h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
             <img
-              src={!pg.imageUrl ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80" : pg.imageUrl.startsWith('http') ? pg.imageUrl : `${api.defaults.baseURL}/api/users/images/${pg.imageUrl}`}
+              src={!pg.images || pg.images.length === 0 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80" : pg.images[0].startsWith('http') ? pg.images[0] : `${api.defaults.baseURL}/api/users/images/${pg.images[0]}`}
               alt="Main"
               className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
             />
@@ -123,10 +123,10 @@ const PgDetails = () => {
           </div>
           <div className="hidden md:flex md:col-span-4 flex-col gap-4 h-full">
             <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
-              <img src="https://images.unsplash.com/photo-1502672260266-1c1f56a6428c?auto=format&fit=crop&w=800&q=80" alt="Interior 1" className="w-full h-full object-cover" />
+              <img src={!pg.images || pg.images.length <= 1 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" : pg.images[1].startsWith('http') ? pg.images[1] : `${api.defaults.baseURL}/api/users/images/${pg.images[1]}`} alt="Interior 1" className="w-full h-full object-cover" />
             </div>
             <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
-              <img src="https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=800&q=80" alt="Interior 2" className="w-full h-full object-cover" />
+              <img src={!pg.images || pg.images.length <= 2 ? "https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=800&q=80" : pg.images[2].startsWith('http') ? pg.images[2] : `${api.defaults.baseURL}/api/users/images/${pg.images[2]}`} alt="Interior 2" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ const PgDetails = () => {
                     >
                       <div className="w-full sm:w-48 h-32 rounded-2xl overflow-hidden shrink-0">
                         <img
-                          src={!other.imageUrl ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80" : other.imageUrl.startsWith('http') ? other.imageUrl : `${api.defaults.baseURL}/api/users/images/${other.imageUrl}`}
+                          src={!other.images || other.images.length === 0 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80" : other.images[0].startsWith('http') ? other.images[0] : `${api.defaults.baseURL}/api/users/images/${other.images[0]}`}
                           alt={other.name}
                           className="w-full h-full object-cover"
                         />

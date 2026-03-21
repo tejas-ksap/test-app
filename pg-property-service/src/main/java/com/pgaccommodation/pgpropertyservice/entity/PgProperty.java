@@ -6,16 +6,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -100,9 +97,8 @@ public class PgProperty {
 	private BigDecimal rating;
 	private Boolean verified;
 
-	@ElementCollection
-	@CollectionTable(name = "pg_property_images", joinColumns = @JoinColumn(name = "pg_id"))
-	@Column(name = "image_data", columnDefinition = "LONGTEXT")
+	@jakarta.persistence.Convert(converter = StringListConverter.class)
+	@Column(name = "images", columnDefinition = "TEXT")
 	private List<String> images;
 
 	private LocalDateTime createdAt;

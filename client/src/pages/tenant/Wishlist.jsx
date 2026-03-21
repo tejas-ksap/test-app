@@ -84,7 +84,7 @@ const Wishlist = () => {
                   <img
                     alt="PG Interior"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    src={!pg.imageUrl ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" : pg.imageUrl.startsWith('http') ? pg.imageUrl : `${api.defaults.baseURL}/api/users/images/${pg.imageUrl}`}
+                    src={!pg.images || pg.images.length === 0 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" : pg.images[0].startsWith('http') ? pg.images[0] : `${api.defaults.baseURL}/api/users/images/${pg.images[0]}`}
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
