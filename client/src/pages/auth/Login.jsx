@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import api from "../../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const Login = () => {
       const userData = userRes.data;
 
       login(token, userData);
+      toast.success("Welcome back, " + (userData.fullName || userData.username) + "!");
 
       const role = userData.userType;
       if (role === "ADMIN") navigate("/admin/dashboard");

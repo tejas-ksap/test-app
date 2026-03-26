@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const RegisterPG = () => {
   const navigate = useNavigate();
@@ -135,9 +136,11 @@ const RegisterPG = () => {
 
       if (isEditMode) {
         await api.put(`/api/pg-properties/${id}`, payload);
+        toast.success("PG Updated Successfully!");
         setSuccess("PG Updated Successfully!");
       } else {
         await api.post("/api/pg-properties", payload);
+        toast.success("PG Registered Successfully!");
         setSuccess("PG Registered Successfully!");
       }
       setTimeout(() => navigate("/owner/pg-list"), 1500);
