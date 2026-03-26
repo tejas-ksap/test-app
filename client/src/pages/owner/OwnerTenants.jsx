@@ -15,6 +15,7 @@ import {
   PiArrowRight,
   PiTimer
 } from "react-icons/pi";
+import CustomDropdown from "../../components/common/CustomDropdown";
 
 const OwnerTenants = () => {
   const { user } = useAuth();
@@ -23,6 +24,14 @@ const OwnerTenants = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [pendingStatuses, setPendingStatuses] = useState({});
+  const [updatingId, setUpdatingId] = useState(null);
+
+  const getImageUrl = (pic) => {
+    if (!pic) return null;
+    if (pic.startsWith('http')) return pic;
+    return `${api.defaults.baseURL || "http://localhost:8085"}/api/users/images/${pic}`;
+  };
 
   const calculateMonths = (start, end) => {
     if (!start || !end) return 0;
@@ -182,13 +191,13 @@ const OwnerTenants = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative group">
+        {/* Global Search Bar */}
+        <div className="relative group mb-10">
           <PiMagnifyingGlass className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#5A45FF] transition-colors" size={24} />
           <input
             type="text"
             placeholder="Search by name, PG, or email..."
-            className="w-full pl-16 pr-6 py-5 bg-white dark:bg-gray-900/80 border-none rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-none focus:ring-2 focus:ring-[#5A45FF]/50 transition-all text-lg dark:text-white dark:placeholder-gray-500 backdrop-blur-md"
+            className="w-full pl-16 pr-6 py-5 bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-none focus:ring-4 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50 transition-all text-lg dark:text-white dark:placeholder-gray-500 backdrop-blur-xl outline-none font-medium"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -226,7 +235,7 @@ const OwnerTenants = () => {
                     <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-[#5A45FF]/30 group-hover:rotate-6 transition-transform overflow-hidden">
                       {b.profileImage ? (
                         <img 
-                          src={b.profileImage.startsWith('http') ? b.profileImage : `${api.defaults.baseURL}/api/users/images/${b.profileImage}`} 
+                          src={getImageUrl(b.profileImage)} 
                           alt={b.fullName} 
                           className="w-full h-full object-cover"
                         />
@@ -298,28 +307,34 @@ const OwnerTenants = () => {
                     <div className="w-full sm:w-auto p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 group/action">
                       <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Status Action</p>
                       <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <select 
-                            className="appearance-none bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl px-5 py-3 pr-12 font-black text-sm focus:ring-4 focus:ring-[#5A45FF]/10 transition-all dark:text-white outline-none cursor-pointer"
-                            value={selectedStatus[b.id] || b.status}
-                            onChange={(e) => setSelectedStatus(prev => ({ ...prev, [b.id]: e.target.value }))}
-                          >
-                            <option value="CONFIRMED">CONFIRMED</option>
-                            <option value="PENDING">PENDING</option>
-                            <option value="CANCELLED">CANCELLED</option>
-                          </select>
-                          <PiArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 rotate-90" size={14} />
-                        </div>
+                        <CustomDropdown 
+                          className="w-48"
+                          options={[
+                            { label: "CONFIRMED", value: "CONFIRMED" },
+                            { label: "PENDING", value: "PENDING" },
+                            { label: "CANCELLED", value: "CANCELLED" }
+                          ]}
+                          value={selectedStatus[b.id] || b.status}
+                          onChange={(e) => setSelectedStatus(prev => ({ ...prev, [b.id]: e.target.value }))}
+                          name="status"
+                        />
                         <button 
                           onClick={() => handleUpdateStatus(b.id, selectedStatus[b.id] || b.status)}
-                          disabled={(selectedStatus[b.id] || b.status) === b.status}
-                          className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${
+                          disabled={updatingId === b.id || (selectedStatus[b.id] || b.status) === b.status}
+                          className={`flex items-center gap-2 px-5 py-3 rounded-2xl transition-all font-black text-sm uppercase tracking-widest ${
                             (selectedStatus[b.id] || b.status) === b.status 
-                            ? "bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed" 
-                            : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-lg shadow-[#5A45FF]/30 active:scale-90"
+                            ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed" 
+                            : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-xl shadow-[#5A45FF]/30 active:scale-95 hover:scale-105"
                           }`}
                         >
-                          <PiArrowRight size={20} weight="black" />
+                          {updatingId === b.id ? (
+                            <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <>
+                              <PiCheckCircle size={20} weight="black" />
+                              <span>Update</span>
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>

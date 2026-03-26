@@ -3,59 +3,8 @@ import api from "../../services/api";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
-import { HiChevronDown } from "react-icons/hi2";
-  
-const CustomDropdown = ({ label, value, options, onChange, name }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const selectedOption = options.find(opt => String(opt.value) === String(value));
-
-  return (
-    <div className="space-y-1.5 relative" ref={dropdownRef}>
-      <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
-      <div 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition font-bold flex items-center justify-between cursor-pointer hover:shadow-sm group"
-      >
-        <span className={selectedOption ? "" : "text-gray-400"}>
-          {selectedOption ? selectedOption.label : "Select..."}
-        </span>
-        <span className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''} text-gray-400 group-hover:text-[#5A45FF]`}>
-          <HiChevronDown className="h-5 w-5" />
-        </span>
-      </div>
-
-      {isOpen && (
-        <div className="absolute z-[60] mt-2 w-full bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 animate-in fade-in zoom-in duration-200">
-          {options.map((opt) => (
-            <div 
-              key={opt.value}
-              onClick={() => {
-                onChange({ target: { name, value: opt.value } });
-                setIsOpen(false);
-              }}
-              className={`px-4 py-3 rounded-xl cursor-pointer font-bold text-sm transition-all mb-1 last:mb-0 ${String(value) === String(opt.value) ? 'bg-[#5A45FF] text-white shadow-lg shadow-[#5A45FF]/20' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
+import CustomDropdown from "../../components/common/CustomDropdown";
+import { PiMagnifyingGlass, PiUser, PiShieldCheck, PiTrash, PiPencilSimple } from "react-icons/pi";
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +12,12 @@ const AdminUsers = () => {
   const [editForm, setEditForm] = useState({ username: "", email: "", userType: "", phone: "", fullName: "", isActive: true });
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const getImageUrl = (pic) => {
+    if (!pic) return null;
+    if (pic.startsWith('http')) return pic;
+    return `${api.defaults.baseURL || "http://localhost:8085"}/api/users/images/${pic}`;
+  };
   const { user: loggedInUser } = useAuth();
 
   const fetchUsers = () => {
@@ -149,16 +104,17 @@ const AdminUsers = () => {
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Manage accounts, roles, and access across the platform.</p>
         </div>
         
-        <div className="flex items-center gap-4 bg-white dark:bg-gray-800 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-full md:w-96">
-          <span className="material-icons-outlined text-gray-400 ml-2">search</span>
-          <input
-            type="text"
-            className="bg-transparent border-none focus:ring-0 w-full text-gray-700 dark:text-white placeholder-gray-400 font-medium outline-none"
-            placeholder="Search by name, email, role..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
+      {/* Global Search Bar */}
+      <div className="relative group mb-10">
+        <PiMagnifyingGlass className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#5A45FF] transition-colors" size={24} />
+        <input 
+          type="text" 
+          placeholder="Search by name, email, or role..." 
+          value={search} 
+          onChange={e => setSearch(e.target.value)} 
+          className="w-full pl-16 pr-6 py-5 bg-white dark:bg-gray-900/40 border border-gray-200 dark:border-gray-800 rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-none focus:ring-4 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50 transition-all text-lg dark:text-white dark:placeholder-gray-500 backdrop-blur-xl outline-none font-medium"
+        />
+      </div>
       </div>
 
       {loading ? (
@@ -182,7 +138,7 @@ const AdminUsers = () => {
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] flex items-center justify-center text-white font-black text-xl shadow-lg shadow-[#5A45FF]/20 overflow-hidden">
                   {u.profilePic ? (
                     <img 
-                      src={u.profilePic.startsWith('http') ? u.profilePic : `${api.defaults.baseURL}/api/users/images/${u.profilePic}`} 
+                      src={getImageUrl(u.profilePic)} 
                       alt={u.fullName || u.username} 
                       className="w-full h-full object-cover" 
                     />

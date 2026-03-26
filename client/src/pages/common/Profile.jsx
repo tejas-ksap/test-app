@@ -105,7 +105,7 @@ const Profile = () => {
             <div className="relative group cursor-pointer">
               <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-50 dark:border-gray-700 shadow-md">
                 {formData.profilePic ? (
-                  <img src={formData.profilePic.startsWith('http') ? formData.profilePic : `${api.defaults.baseURL}/api/users/images/${formData.profilePic}`} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={formData.profilePic.startsWith('http') ? formData.profilePic : `${api.defaults.baseURL || "http://localhost:8085"}/api/users/images/${formData.profilePic}`} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                     <span className="material-icons-outlined text-4xl text-gray-400">person</span>
