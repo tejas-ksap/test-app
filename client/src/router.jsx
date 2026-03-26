@@ -51,6 +51,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "users", element: <AdminUsers /> },
           { path: "pgs", element: <AdminPGs /> },
+          { path: "edit-pg/:id", element: <RegisterPG /> },
           { path: "bookings", element: <AdminBookings /> },
           { path: "profile", element: <Profile /> },
         ],

@@ -123,7 +123,7 @@ const RegisterPG = () => {
 
       const payload = {
         ...formData,
-        ownerId: user?.userid,
+        ownerId: formData.ownerId || user?.userid,
         latitude: parseFloat(formData.latitude),
         longitude: parseFloat(formData.longitude),
         totalRooms: parseInt(formData.totalRooms),
@@ -143,7 +143,7 @@ const RegisterPG = () => {
         toast.success("PG Registered Successfully!");
         setSuccess("PG Registered Successfully!");
       }
-      setTimeout(() => navigate("/owner/pg-list"), 1500);
+      setTimeout(() => navigate(user?.role === "ADMIN" ? "/admin/pgs" : "/owner/pg-list"), 1500);
     } catch (err) {
       console.error(err);
       setError("Failed to register PG. Check all fields.");
@@ -530,7 +530,7 @@ const RegisterPG = () => {
               ) : (
                 <>
                   <span className="material-icons-outlined">{isEditMode ? "save" : "add_business"}</span>
-                  {isEditMode ? "Submit Registration" : "Submit Registration"}
+                  {isEditMode ? "Save Changes" : "Submit Registration"}
                 </>
               )}
             </button>

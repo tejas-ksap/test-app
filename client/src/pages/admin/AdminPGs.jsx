@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { toast } from "react-toastify";
+import PGCard from "../../components/common/PGCard";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
 
 const AdminPGs = () => {
+  const navigate = useNavigate();
   const [pgs, setPgs] = useState([]);
-  const [sortField, setSortField] = useState("pgId");
-  const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading] = useState(true);
-  const [editPG, setEditPG] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", city: "", ownerId: "", pgType: "", pricePerBed: "" });
-  const [viewPG, setViewPG] = useState(null);
   const [search, setSearch] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const fetchPGs = () => {
+    setLoading(true);
     api.get("/api/pg-properties")
       .then(res => setPgs(res.data))
       .catch(() => toast.error("Failed to fetch PGs"))
@@ -23,309 +24,110 @@ const AdminPGs = () => {
     fetchPGs();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this PG?")) return;
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await api.delete(`/api/pg-properties/${id}`);
+      await api.delete(`/api/pg-properties/${deleteTarget}`);
       toast.success("PG deleted successfully");
-      setPgs(pgs.filter(pg => pg.pgId !== id));
+      setPgs(pgs.filter(pg => pg.pgId !== deleteTarget));
     } catch {
       toast.error("Failed to delete PG");
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
-  const handleEdit = (pg) => {
-    setEditPG(pg);
-    setEditForm({
-      name: pg.name || "",
-      ownerId: pg.ownerId || "",
-      address: pg.address || "",
-      city: pg.city || "",
-      state: pg.state || "",
-      pincode: pg.pincode || "",
-      landmark: pg.landmark || "",
-      latitude: pg.latitude?.parsedValue ?? pg.latitude ?? "",
-      longitude: pg.longitude?.parsedValue ?? pg.longitude ?? "",
-      description: pg.description || "",
-      totalRooms: pg.totalRooms || "",
-      availableRooms: pg.availableRooms || "",
-      pricePerBed: pg.pricePerBed?.parsedValue ?? pg.pricePerBed ?? "",
-      depositAmount: pg.depositAmount?.parsedValue ?? pg.depositAmount ?? "",
-      foodIncluded: pg.foodIncluded ?? false,
-      acAvailable: pg.acAvailable ?? false,
-      wifiAvailable: pg.wifiAvailable ?? false,
-      laundryAvailable: pg.laundryAvailable ?? false,
-      pgType: pg.pgType || "",
-      rating: pg.rating?.parsedValue ?? pg.rating ?? "",
-      verified: pg.verified ?? false,
-    });
-  }
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditForm(f => ({ ...f, [name]: value }));
-  };
-
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const pgId = editPG.pgId;
-      const res = await api.put(`/api/pg-properties/${pgId}`, { ...editPG, ...editForm });
-      toast.success("PG updated successfully");
-      setPgs(pgs.map(pg => pg.pgId === pgId ? res.data : pg));
-      setEditPG(null);
-    } catch {
-      toast.error("Failed to update PG");
-    }
-  };
-
-  // Sorting handler
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
-  };
-
-  const handleView = async (id) => {
-    try {
-      const res = await api.get(`/api/pg-properties/${id}`);
-      setViewPG(res.data);
-    } catch {
-      toast.error("Failed to fetch PG details");
-    }
-  };
+  const filteredPGs = pgs.filter(pg => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      pg.name?.toLowerCase().includes(q) ||
+      pg.city?.toLowerCase().includes(q) ||
+      pg.ownerId?.toString().toLowerCase().includes(q) ||
+      pg.pgType?.toLowerCase().includes(q) ||
+      (pg.pricePerBed?.parsedValue ?? pg.pricePerBed)?.toString().toLowerCase().includes(q)
+    );
+  });
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">All PG Properties</h2>
-      {/* Search Bar */}
-      <div className="mb-4 flex items-center gap-4">
-        <label htmlFor="pg-search" className="font-medium text-gray-700">Search:</label>
-        <input
-          id="pg-search"
-          type="text"
-          className="border px-3 py-2 rounded w-64 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          placeholder="Type name, city, owner ID, type, or price..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+    <div className="min-h-screen bg-transparent animate-in fade-in duration-700 pb-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div>
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">All PG Properties</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Manage all property listings across the platform.</p>
+        </div>
+        
+        <div className="flex items-center gap-4 bg-white dark:bg-gray-800 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-full md:w-96">
+          <span className="material-icons-outlined text-gray-400 ml-2">search</span>
+          <input
+            type="text"
+            className="bg-transparent border-none focus:ring-0 w-full text-gray-700 dark:text-white placeholder-gray-400 font-medium"
+            placeholder="Search by name, city, owner..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
       </div>
-      {loading ? <p>Loading...</p> : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border rounded-lg shadow-md">
-            <thead>
-              <tr className="bg-blue-100 text-blue-900">
-                <th className="px-4 py-2 font-semibold rounded-tl-lg cursor-pointer" onClick={() => handleSort("pgId")}>ID {sortField === "pgId" ? (sortOrder === "asc" ? "▲" : "▼") : ""}</th>
-                <th className="px-4 py-2 font-semibold cursor-pointer" onClick={() => handleSort("name")}>Name {sortField === "name" ? (sortOrder === "asc" ? "▲" : "▼") : ""}</th>
-                <th className="px-4 py-2 font-semibold cursor-pointer" onClick={() => handleSort("city")}>City {sortField === "city" ? (sortOrder === "asc" ? "▲" : "▼") : ""}</th>
-                <th className="px-4 py-2 font-semibold cursor-pointer" onClick={() => handleSort("ownerId")}>Owner ID {sortField === "ownerId" ? (sortOrder === "asc" ? "▲" : "▼") : ""}</th>
-                <th className="px-4 py-2 font-semibold cursor-pointer" onClick={() => handleSort("pgType")}>Type {sortField === "pgType" ? (sortOrder === "asc" ? "▲" : "▼") : ""}</th>
-                <th className="px-4 py-2 font-semibold cursor-pointer" onClick={() => handleSort("pricePerBed")}>Price/Bed {sortField === "pricePerBed" ? (sortOrder === "asc" ? "▲" : "▼") : ""}</th>
-                <th className="px-4 py-2 font-semibold rounded-tr-lg">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...pgs]
-                .filter(pg => {
-                  const q = search.trim().toLowerCase();
-                  if (!q) return true;
-                  return (
-                    pg.name?.toLowerCase().includes(q) ||
-                    pg.city?.toLowerCase().includes(q) ||
-                    pg.ownerId?.toString().toLowerCase().includes(q) ||
-                    pg.pgType?.toLowerCase().includes(q) ||
-                    (pg.pricePerBed?.parsedValue ?? pg.pricePerBed)?.toString().toLowerCase().includes(q)
-                  );
-                })
-                .sort((a, b) => {
-                  let valA = a[sortField];
-                  let valB = b[sortField];
-                  if (valA == null) valA = "";
-                  if (valB == null) valB = "";
-                  if (typeof valA === "string") valA = valA.toLowerCase();
-                  if (typeof valB === "string") valB = valB.toLowerCase();
-                  if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-                  if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-                  return 0;
-                })
-                .map((pg, idx) => (
-                  <tr key={pg.pgId} className={idx % 2 === 0 ? "bg-white" : "bg-blue-50 hover:bg-blue-100 transition"}>
-                    <td className="px-4 py-2 border-b">{pg.pgId}</td>
-                    <td className="px-4 py-2 border-b">{pg.name}</td>
-                    <td className="px-4 py-2 border-b">{pg.city}</td>
-                    <td className="px-4 py-2 border-b">{pg.ownerId}</td>
-                    <td className="px-4 py-2 border-b">{pg.pgType}</td>
-                    <td className="px-4 py-2 border-b">{pg.pricePerBed?.parsedValue ?? pg.pricePerBed}</td>
-                    <td className="px-4 py-2 border-b">
-                      <div className="flex gap-4 justify-center">
-                        <button className="bg-blue-100 text-blue-700 px-3 py-1 rounded shadow hover:bg-blue-200 transition font-medium" onClick={() => handleView(pg.pgId)}>View</button>
-                        <button className="bg-green-100 text-green-700 px-3 py-1 rounded shadow hover:bg-green-200 transition font-medium" onClick={() => handleEdit(pg)}>Edit</button>
-                        <button className="bg-red-100 text-red-700 px-3 py-1 rounded shadow hover:bg-red-200 transition font-medium" onClick={() => handleDelete(pg.pgId)}>Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
-      {/* Edit Modal */}
-      {editPG && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full overflow-y-auto max-h-[90vh]">
-            <h3 className="text-xl font-bold mb-4">Edit PG</h3>
-            <form onSubmit={handleEditSubmit} className="space-y-3">
-              <div>
-                <label className="block font-medium mb-1">Name</label>
-                <input name="name" value={editForm.name} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Owner ID</label>
-                <input name="ownerId" value={editForm.ownerId} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Address</label>
-                <input name="address" value={editForm.address || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">City</label>
-                <input name="city" value={editForm.city} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">State</label>
-                <input name="state" value={editForm.state || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Pincode</label>
-                <input name="pincode" value={editForm.pincode || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Landmark</label>
-                <input name="landmark" value={editForm.landmark || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Latitude</label>
-                <input name="latitude" value={editForm.latitude || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Longitude</label>
-                <input name="longitude" value={editForm.longitude || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Description</label>
-                <textarea name="description" value={editForm.description || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Total Rooms</label>
-                <input name="totalRooms" value={editForm.totalRooms || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Available Rooms</label>
-                <input name="availableRooms" value={editForm.availableRooms || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Price/Bed</label>
-                <input name="pricePerBed" value={editForm.pricePerBed || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Deposit Amount</label>
-                <input name="depositAmount" value={editForm.depositAmount || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Food Included</label>
-                <select name="foodIncluded" value={editForm.foodIncluded ? "true" : "false"} onChange={e => setEditForm(f => ({ ...f, foodIncluded: e.target.value === "true" }))} className="border rounded px-2 py-1 w-full">
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium mb-1">AC Available</label>
-                <select name="acAvailable" value={editForm.acAvailable ? "true" : "false"} onChange={e => setEditForm(f => ({ ...f, acAvailable: e.target.value === "true" }))} className="border rounded px-2 py-1 w-full">
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium mb-1">WiFi Available</label>
-                <select name="wifiAvailable" value={editForm.wifiAvailable ? "true" : "false"} onChange={e => setEditForm(f => ({ ...f, wifiAvailable: e.target.value === "true" }))} className="border rounded px-2 py-1 w-full">
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Laundry Available</label>
-                <select name="laundryAvailable" value={editForm.laundryAvailable ? "true" : "false"} onChange={e => setEditForm(f => ({ ...f, laundryAvailable: e.target.value === "true" }))} className="border rounded px-2 py-1 w-full">
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Type</label>
-                <select name="pgType" value={editForm.pgType} onChange={handleEditChange} className="border rounded px-2 py-1 w-full">
-                  <option value="MALE_ONLY">Boys</option>
-                  <option value="FEMALE_ONLY">Girls</option>
-                  <option value="UNISEX">Unisex</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Rating</label>
-                <input name="rating" value={editForm.rating || ""} onChange={handleEditChange} className="border rounded px-2 py-1 w-full" />
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Verified</label>
-                <select name="verified" value={editForm.verified ? "true" : "false"} onChange={e => setEditForm(f => ({ ...f, verified: e.target.value === "true" }))} className="border rounded px-2 py-1 w-full">
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-                <button type="button" className="bg-gray-400 text-white px-4 py-2 rounded" onClick={() => setEditPG(null)}>Cancel</button>
-              </div>
-            </form>
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+            <div key={i} className="h-80 bg-gray-100 dark:bg-gray-800 animate-pulse rounded-[2.5rem]" />
+          ))}
+        </div>
+      ) : filteredPGs.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 p-20 rounded-[3rem] text-center">
+          <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="material-icons-outlined text-4xl text-gray-300">search_off</span>
           </div>
+          <p className="text-gray-400 dark:text-gray-500 font-bold text-xl">No properties found matching your search.</p>
         </div>
-      )}
-
-      {/* View Modal */}
-      {viewPG && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full overflow-y-auto max-h-[90vh]">
-            <h3 className="text-xl font-bold mb-4">PG Details</h3>
-            <div className="space-y-2 text-sm">
-              <p><strong>ID:</strong> {viewPG.pgId ?? viewPG.id}</p>
-              <p><strong>Name:</strong> {viewPG.name}</p>
-              <p><strong>Owner ID:</strong> {viewPG.ownerId}</p>
-              <p><strong>Address:</strong> {viewPG.address}</p>
-              <p><strong>City:</strong> {viewPG.city}</p>
-              <p><strong>State:</strong> {viewPG.state}</p>
-              <p><strong>Pincode:</strong> {viewPG.pincode}</p>
-              <p><strong>Landmark:</strong> {viewPG.landmark}</p>
-              <p><strong>Latitude:</strong> {viewPG.latitude?.parsedValue ?? viewPG.latitude}</p>
-              <p><strong>Longitude:</strong> {viewPG.longitude?.parsedValue ?? viewPG.longitude}</p>
-              <p><strong>Description:</strong> {viewPG.description}</p>
-              <p><strong>Total Rooms:</strong> {viewPG.totalRooms}</p>
-              <p><strong>Available Rooms:</strong> {viewPG.availableRooms}</p>
-              <p><strong>Price/Bed:</strong> {viewPG.pricePerBed?.parsedValue ?? viewPG.pricePerBed}</p>
-              <p><strong>Deposit Amount:</strong> {viewPG.depositAmount?.parsedValue ?? viewPG.depositAmount}</p>
-              <p><strong>Food Included:</strong> {viewPG.foodIncluded ? "Yes" : "No"}</p>
-              <p><strong>AC Available:</strong> {viewPG.acAvailable ? "Yes" : "No"}</p>
-              <p><strong>WiFi Available:</strong> {viewPG.wifiAvailable ? "Yes" : "No"}</p>
-              <p><strong>Laundry Available:</strong> {viewPG.laundryAvailable ? "Yes" : "No"}</p>
-              <p><strong>Type:</strong> {viewPG.pgType}</p>
-              <p><strong>Rating:</strong> {viewPG.rating?.parsedValue ?? viewPG.rating}</p>
-              <p><strong>Verified:</strong> {viewPG.verified ? "Yes" : "No"}</p>
-              <p><strong>Created At:</strong> {viewPG.createdAt ?? "-"}</p>
-              <p><strong>Updated At:</strong> {viewPG.updatedAt ?? "-"}</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {filteredPGs.map((pg) => (
+            <div key={pg.pgId} className="flex flex-col group h-full">
+              <PGCard
+                id={pg.pgId}
+                name={pg.name}
+                location={`${pg.city}, ${pg.state}`}
+                price={`₹${pg.pricePerBed?.parsedValue ?? pg.pricePerBed}/bed`}
+                rating={pg.rating?.parsedValue ?? pg.rating ?? "New"}
+                image={pg.images?.[0]}
+              >
+                <div className="flex flex-col gap-3 w-full">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Owner ID: {pg.ownerId}</span>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/admin/edit-pg/${pg.pgId}`)}
+                    className="w-full flex items-center justify-center gap-2 bg-[#5A45FF]/10 dark:bg-[#5A45FF]/20 text-[#5A45FF] dark:text-[#8E7DFF] hover:bg-[#5A45FF]/20 dark:hover:bg-[#5A45FF]/30 px-4 py-3 rounded-xl font-black transition-all text-sm uppercase tracking-wider"
+                  >
+                    <span className="material-icons-outlined text-[18px]">edit</span>
+                    Edit Details
+                  </button>
+                  <button 
+                    onClick={() => setDeleteTarget(pg.pgId)}
+                    className="w-full flex items-center justify-center gap-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 px-4 py-3 rounded-xl font-black transition-all text-sm uppercase tracking-wider"
+                  >
+                    <span className="material-icons-outlined text-[18px]">delete</span>
+                    Remove Property
+                  </button>
+                </div>
+              </PGCard>
             </div>
-            <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded" onClick={() => setViewPG(null)}>Close</button>
-          </div>
+          ))}
         </div>
       )}
+
+      {/* Reusable Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={executeDelete}
+        title="Delete Property"
+        message="Are you sure you want to delete this PG Property? This action cannot be undone and will remove all associated bookings."
+        confirmText="Yes, Delete"
+      />
     </div>
   );
 };
