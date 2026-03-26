@@ -2,6 +2,8 @@ import React from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ROLE_CONFIG = {
   ADMIN: { roleLabel: "Admin", icon: "🛡️" },
@@ -36,7 +38,6 @@ const DashboardLayout = () => {
   const { user } = useAuth();
 
   const role = user?.userType || "TENANT";
-  const config = ROLE_CONFIG[role] || ROLE_CONFIG.TENANT;
   const links = NAV_LINKS[role] || NAV_LINKS.TENANT;
 
   return (
@@ -70,6 +71,18 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   );
 };

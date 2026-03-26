@@ -57,7 +57,9 @@ const Profile = () => {
     setImageUploading(true);
     const uploadData = new FormData();
     uploadData.append("file", file);
-    try {
+    
+    // Create the promise for both upload AND save
+    const uploadPromise = (async () => {
       const uploadRes = await api.post("/api/users/images/upload", uploadData);
       const imageId = uploadRes.data.imageKey;
       
@@ -65,11 +67,20 @@ const Profile = () => {
       
       const putData = { ...formData, profilePic: imageId };
       const saveRes = await api.put("/api/users/me", putData);
-      login(token, saveRes.data); 
-      
-      toast.success("Profile picture updated!");
-    } catch (err) {
-      toast.error("Failed to upload image.");
+      login(token, saveRes.data);
+      return saveRes;
+    })();
+
+    toast.promise(uploadPromise, {
+      pending: "Uploading and updating profile picture...",
+      success: "Profile picture saved successfully! 📸",
+      error: "Failed to upload profile picture. 🤯"
+    });
+
+    try {
+      await uploadPromise;
+    } catch {
+      // Error is already handled by toast.promise
     } finally {
       setImageUploading(false);
     }
@@ -78,12 +89,20 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const updatePromise = api.put("/api/users/me", formData);
+
+    toast.promise(updatePromise, {
+      pending: "Saving your profile changes...",
+      success: "Profile updated successfully! 👌",
+      error: "Failed to update profile. Please try again. 🤯"
+    });
+
     try {
-      const res = await api.put("/api/users/me", formData);
-      toast.success("Profile updated successfully");
-      login(token, res.data);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update profile");
+      const res = await updatePromise;
+      login(token, res.data); // Update AuthContext user state
+    } catch {
+      // Error is handled by toast.promise
     } finally {
       setLoading(false);
     }
