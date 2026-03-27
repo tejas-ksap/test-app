@@ -229,9 +229,9 @@ const OwnerTenants = () => {
                 key={b.id} 
                 className="group relative bg-white dark:bg-gray-900/90 rounded-[3rem] p-6 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-500 border border-gray-100 dark:border-gray-800 backdrop-blur-md"
               >
-                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-1">
+                <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6">
                   {/* Left: Avatar & Basic Info */}
-                  <div className="flex items-center gap-6 min-w-[320px]">
+                  <div className="flex items-center gap-4 sm:gap-6 min-w-0 xl:w-72 shrink-0">
                     <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] flex items-center justify-center text-white text-3xl font-black shadow-xl shadow-[#5A45FF]/30 group-hover:rotate-6 transition-transform overflow-hidden">
                       {b.profileImage ? (
                         <img 
@@ -243,7 +243,7 @@ const OwnerTenants = () => {
                         b.fullName?.charAt(0) || b.username?.charAt(0) || "U"
                       )}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{b.fullName || b.username}</h3>
                         <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.15em] ${
@@ -266,49 +266,52 @@ const OwnerTenants = () => {
                     </div>
                   </div>
 
-                  {/* Middle: Contact Info */}
-                  <div className="flex flex-wrap gap-4 py-6 lg:py-0 border-y lg:border-y-0 lg:border-x border-gray-100 dark:border-gray-800 lg:px-10 flex-1">
-                    <a href={`tel:${b.phone}`} className="flex items-center gap-3 px-5 py-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-[#5A45FF]/10 dark:hover:bg-[#5A45FF]/20 text-gray-700 dark:text-gray-300 hover:text-[#5A45FF] dark:hover:text-[#8E7DFF] transition-all rounded-2xl font-bold border border-transparent hover:border-[#5A45FF]/20">
-                      <PiPhone size={22} weight="fill" className="text-[#5A45FF]" />
-                      <span>{b.phone || "No phone"}</span>
-                    </a>
-                    <a href={`mailto:${b.email}`} className="flex items-center gap-3 px-5 py-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-[#5A45FF]/10 dark:hover:bg-[#5A45FF]/20 text-gray-700 dark:text-gray-300 hover:text-[#5A45FF] dark:hover:text-[#8E7DFF] transition-all rounded-2xl font-bold border border-transparent hover:border-[#5A45FF]/20">
-                      <PiEnvelope size={22} weight="fill" className="text-[#5A45FF]" />
-                      <span>{b.email || "No email"}</span>
-                    </a>
-                  </div>
+                  {/* Middle: Info & Stats */}
+                  <div className="flex flex-col flex-1 gap-5 py-6 xl:py-0 border-y xl:border-y-0 xl:border-x border-gray-100 dark:border-gray-800 xl:px-8 min-w-0">
+                    {/* Row 1: Contact Info */}
+                    <div className="flex flex-wrap items-center gap-4">
+                      <a href={`tel:${b.phone}`} className="flex items-center gap-3 px-4 py-2.5 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-[#5A45FF]/10 text-gray-700 dark:text-gray-300 rounded-2xl font-bold border border-transparent transition-all truncate min-w-[160px]">
+                        <PiPhone size={18} weight="fill" className="text-[#5A45FF] shrink-0" />
+                        <span className="truncate text-sm font-black">{b.phone || "No phone"}</span>
+                      </a>
+                      <a href={`mailto:${b.email}`} className="flex items-center gap-3 px-4 py-2.5 bg-gray-50/50 dark:bg-gray-800/30 hover:bg-[#5A45FF]/10 text-gray-700 dark:text-gray-300 rounded-2xl font-bold border border-transparent transition-all truncate min-w-[200px]">
+                        <PiEnvelope size={18} weight="fill" className="text-[#5A45FF] shrink-0" />
+                        <span className="truncate text-sm font-black">{b.email || "No email"}</span>
+                      </a>
+                    </div>
 
-                  {/* Right: Stay Details & Actions */}
-                  <div className="flex flex-col sm:flex-row items-center gap-10 w-full lg:w-auto">
-                    <div className="space-y-5 min-w-[200px]">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm">
-                          <PiCalendarBlank size={24} />
+                    {/* Row 2: Stay Details */}
+                    <div className="flex flex-wrap items-center gap-8">
+                      <div className="flex items-center gap-3 min-w-0 font-display">
+                        <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 shrink-0 shadow-sm">
+                          <PiCalendarBlank size={20} />
                         </div>
-                        <div>
-                          <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Stay Period</p>
-                          <p className="text-gray-900 dark:text-gray-200 font-black">
+                        <div className="min-w-0">
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Stay Period</p>
+                          <p className="text-gray-900 dark:text-gray-200 font-black text-[13px] truncate">
                             {new Date(b.startDate).toLocaleDateString()} - {new Date(b.endDate).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 shadow-sm">
-                          <PiTimer size={24} />
+                      <div className="flex items-center gap-3 min-w-0 font-display">
+                        <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 shrink-0 shadow-sm">
+                          <PiTimer size={20} />
                         </div>
-                        <div>
-                          <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Duration</p>
-                          <p className="text-gray-900 dark:text-gray-200 font-black tracking-tight">{calculateMonths(b.startDate, b.endDate)} Months</p>
+                        <div className="min-w-0">
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Duration</p>
+                          <p className="text-gray-900 dark:text-gray-200 font-black text-[13px]">{calculateMonths(b.startDate, b.endDate)} Months</p>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Quick Action */}
-                    <div className="w-full sm:w-auto p-6 bg-gray-50 dark:bg-gray-800/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 group/action">
-                      <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Status Action</p>
-                      <div className="flex items-center gap-3">
+                  {/* Right: Actions */}
+                  <div className="w-full xl:w-auto pt-4 xl:pt-0">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-inner-sm">
+                      <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-3 text-center">Status Action</p>
+                      <div className="flex flex-col sm:flex-row xl:flex-row items-stretch sm:items-center gap-2">
                         <CustomDropdown 
-                          className="w-48"
+                          className="w-full sm:w-36"
                           options={[
                             { label: "CONFIRMED", value: "CONFIRMED" },
                             { label: "PENDING", value: "PENDING" },
@@ -321,17 +324,17 @@ const OwnerTenants = () => {
                         <button 
                           onClick={() => handleUpdateStatus(b.id, selectedStatus[b.id] || b.status)}
                           disabled={updatingId === b.id || (selectedStatus[b.id] || b.status) === b.status}
-                          className={`flex items-center gap-2 px-5 py-3 rounded-2xl transition-all font-black text-sm uppercase tracking-widest ${
+                          className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest ${
                             (selectedStatus[b.id] || b.status) === b.status 
                             ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed" 
-                            : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-xl shadow-[#5A45FF]/30 active:scale-95 hover:scale-105"
+                            : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-lg shadow-[#5A45FF]/20 active:scale-95"
                           }`}
                         >
                           {updatingId === b.id ? (
-                            <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           ) : (
                             <>
-                              <PiCheckCircle size={20} weight="black" />
+                              <PiCheckCircle size={18} weight="black" />
                               <span>Update</span>
                             </>
                           )}
