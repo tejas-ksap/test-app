@@ -42,11 +42,9 @@ const Login = () => {
       else navigate("/");
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.message ||
-        err.response?.data ||
-        "Login failed. Please check your credentials."
-      );
+      const message = err.response?.data?.message || err.response?.data || "Login failed. Please check your credentials.";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -45,11 +45,9 @@ const Register = () => {
     } catch (err) {
       console.error("Register error:", err);
       setSuccess("");
-      setError(
-        err.response?.data?.message ||
-        err.response?.data ||
-        "Registration failed"
-      );
+      const message = err.response?.data?.message || err.response?.data || "Registration failed";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

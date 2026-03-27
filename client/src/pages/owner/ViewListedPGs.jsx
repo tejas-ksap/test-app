@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
+import { toast } from "react-toastify";
 import PGCard from "../../components/common/PGCard";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
 
@@ -31,8 +32,10 @@ const ViewPGs = () => {
     if (!deleteTarget) return;
     try {
       await api.delete(`/api/pg-properties/${deleteTarget}`);
+      toast.success("Property deleted successfully!");
       setPgs(pgs.filter(pg => pg.pgId !== deleteTarget));
     } catch {
+      toast.error("Failed to delete property.");
       setError("Failed to delete PG");
     } finally {
       setDeleteTarget(null);
