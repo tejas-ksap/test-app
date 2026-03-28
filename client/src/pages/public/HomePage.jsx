@@ -147,7 +147,7 @@ const HomePage = () => {
                     </div>
 
                     <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4 mb-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div>Rooms: <span className="font-semibold text-gray-900 dark:text-white">{pg.availableRooms}</span></div>
+                      <div><span className="font-bold text-primary">{pg.availableRooms}</span> vacancies left <span className="text-xs text-gray-400">out of {pg.totalRooms || 10}</span></div>
                       <div>Deposit: <span className="font-semibold text-gray-900 dark:text-white">₹{pg.depositAmount?.parsedValue ?? pg.depositAmount}</span></div>
                     </div>
 
@@ -169,6 +169,8 @@ const HomePage = () => {
         pgName={selectedPGForBooking?.name} 
         price={selectedPGForBooking?.pricePerBed?.parsedValue ?? selectedPGForBooking?.pricePerBed}
         typeStr={selectedPGForBooking?.pgType === "MALE_ONLY" ? "Male Only" : selectedPGForBooking?.pgType === "FEMALE_ONLY" ? "Female Only" : "Unisex"}
+        availableRooms={selectedPGForBooking?.availableRooms}
+        totalRooms={selectedPGForBooking?.totalRooms}
       />
     </div>
   );

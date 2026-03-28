@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.pgaccommodation.pgpropertyservice.entity.PgProperty;
 
 public interface PgPropertyRepository extends JpaRepository<PgProperty, Integer> {
-    List<PgProperty> findByCity(String city);
+    List<PgProperty> findByCityAndAvailableRoomsGreaterThan(String city, Integer minAvailable);
+    List<PgProperty> findByAvailableRoomsGreaterThan(Integer minAvailable);
     List<PgProperty> findByOwnerId(Integer ownerId);
 }

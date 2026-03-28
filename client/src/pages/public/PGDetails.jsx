@@ -351,6 +351,13 @@ const PgDetails = () => {
                 </div>
               </div>
 
+              <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-between border border-gray-100 dark:border-gray-700">
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Availability</p>
+                <p className={`text-sm font-black uppercase ${pg.availableRooms > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                  {pg.availableRooms > 0 ? `${pg.availableRooms} / ${pg.totalRooms || 10} Vacant` : 'Fully Booked'}
+                </p>
+              </div>
+
               <div className="space-y-5 mb-8">
                 <div>
                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Room Type</label>
@@ -394,9 +401,14 @@ const PgDetails = () => {
 
               <button
                 onClick={handleBookNow}
-                className="w-full bg-[#5A45FF] hover:bg-[#4633e6] text-white text-lg py-5 rounded-[1.25rem] font-bold shadow-xl shadow-[#5A45FF]/20 transition-all active:scale-[0.98]"
+                disabled={pg.availableRooms <= 0}
+                className={`w-full text-lg py-5 rounded-[1.25rem] font-bold shadow-xl transition-all active:scale-[0.98] ${
+                  pg.availableRooms > 0 
+                  ? "bg-[#5A45FF] hover:bg-[#4633e6] text-white shadow-[#5A45FF]/20" 
+                  : "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed shadow-none"
+                }`}
               >
-                Pay & Book
+                {pg.availableRooms > 0 ? "Pay & Book" : "Fully Booked"}
               </button>
 
               <p className="text-center text-xs text-gray-400 mt-4">Secure payment powered by Razorpay</p>

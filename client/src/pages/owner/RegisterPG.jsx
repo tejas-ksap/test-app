@@ -354,7 +354,7 @@ const RegisterPG = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Total Rooms</label>
+                <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Total Capacity (Beds/Vacancies)</label>
                 <input
                   type="number"
                   name="totalRooms"
@@ -365,7 +365,7 @@ const RegisterPG = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Available Rooms</label>
+                <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Current Vacancy</label>
                 <input
                   type="number"
                   name="availableRooms"

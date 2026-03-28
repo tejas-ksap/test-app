@@ -31,12 +31,12 @@ public class PgPropertyServiceImpl implements PgPropertyService {
 
     @Override
     public List<PgProperty> getAllPgProperties() {
-        return pgPropertyRepository.findAll();
+        return pgPropertyRepository.findByAvailableRoomsGreaterThan(0);
     }
 
     @Override
     public List<PgProperty> getPgPropertiesByCity(String city) {
-        return pgPropertyRepository.findByCity(city);
+        return pgPropertyRepository.findByCityAndAvailableRoomsGreaterThan(city, 0);
     }
 
     @Override

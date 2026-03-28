@@ -4,7 +4,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 
-const BookingModal = ({ isOpen, onClose, pgId, pgName, price, typeStr }) => {
+const BookingModal = ({ isOpen, onClose, pgId, pgName, price, typeStr, availableRooms, totalRooms }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -15,6 +15,8 @@ const BookingModal = ({ isOpen, onClose, pgId, pgName, price, typeStr }) => {
   });
 
   if (!isOpen) return null;
+
+  const isFull = availableRooms !== undefined && availableRooms <= 0;
 
   const parsedPrice = price?.parsedValue ?? price ?? 0;
   const displayPrice = typeof parsedPrice === 'string' ? parsedPrice.replace(/[^\d.]/g, '') : parsedPrice;
@@ -128,10 +130,17 @@ const BookingModal = ({ isOpen, onClose, pgId, pgName, price, typeStr }) => {
           </button>
         </div>
 
-        {/* Price Tag */}
-        <div className="flex items-center gap-2 mb-6">
-          <p className="text-3xl font-extrabold text-[#5A45FF]">₹{displayPrice}</p>
-          <span className="text-gray-500 text-sm font-medium mt-1">/ month</span>
+        {/* Price & Availability */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <p className="text-3xl font-extrabold text-[#5A45FF]">₹{displayPrice}</p>
+            <span className="text-gray-500 text-sm font-medium mt-1">/ month</span>
+          </div>
+          {availableRooms !== undefined && (
+            <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isFull ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+              {isFull ? 'Full' : `${availableRooms} Left`}
+            </div>
+          )}
         </div>
 
         {/* Inputs */}
@@ -179,11 +188,17 @@ const BookingModal = ({ isOpen, onClose, pgId, pgName, price, typeStr }) => {
         {/* Submit */}
         <button
           onClick={handleBookNow}
-          disabled={loading}
-          className="w-full bg-[#5A45FF] hover:bg-[#4633e6] disabled:bg-[#5A45FF]/50 text-white text-lg py-4 rounded-xl font-bold shadow-lg shadow-[#5A45FF]/20 transition-all active:scale-[0.98] flex justify-center items-center"
+          disabled={loading || isFull}
+          className={`w-full text-lg py-4 rounded-xl font-bold shadow-lg transition-all active:scale-[0.98] flex justify-center items-center ${
+            isFull 
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none" 
+            : "bg-[#5A45FF] hover:bg-[#4633e6] text-white shadow-[#5A45FF]/20"
+          }`}
         >
           {loading ? (
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+          ) : isFull ? (
+            "Fully Booked"
           ) : (
             "Pay & Book"
           )}

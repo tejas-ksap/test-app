@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 
-const PGCard = ({ id, name, location, price, rating, image, children }) => {
+const PGCard = ({ id, name, location, price, rating, image, availableRooms, totalRooms, children }) => {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-[1.5rem] shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all duration-300 overflow-hidden flex flex-col border border-gray-100 dark:border-gray-800 group/card">
       <Link to={`/pg/${id}`} className="block flex-grow cursor-pointer">
@@ -16,6 +16,13 @@ const PGCard = ({ id, name, location, price, rating, image, children }) => {
             <span className="text-yellow-500 mr-1 text-sm">★</span>
             <p className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tighter">{rating}</p>
           </div>
+          {availableRooms !== undefined && (
+            <div className={`absolute top-4 left-4 backdrop-blur-md px-3 py-1 rounded-full flex items-center shadow-sm ${availableRooms > 0 ? 'bg-green-500/90 text-white' : 'bg-red-500/90 text-white'}`}>
+              <p className="text-[10px] font-black uppercase tracking-tighter font-display">
+                {availableRooms > 0 ? `${availableRooms} Vacancies Left` : 'Fully Booked'}
+              </p>
+            </div>
+          )}
         </div>
         <div className="p-6 text-left space-y-3">
           <div>
@@ -27,9 +34,11 @@ const PGCard = ({ id, name, location, price, rating, image, children }) => {
           </div>
           <div className="flex flex-row justify-between items-center pt-2">
             <p className="font-black text-[#5A45FF] dark:text-[#7C6CFF] text-2xl tracking-tighter">{price}</p>
-            <div className="w-8 h-8 rounded-full bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
-              <span className="material-icons-outlined text-sm">arrow_forward</span>
-            </div>
+            {availableRooms !== undefined && totalRooms !== undefined && (
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
+                {availableRooms} / {totalRooms} available
+              </p>
+            )}
           </div>
         </div>
       </Link>

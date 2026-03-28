@@ -15,7 +15,6 @@ import {
   PiArrowRight,
   PiTimer
 } from "react-icons/pi";
-import CustomDropdown from "../../components/common/CustomDropdown";
 
 const OwnerTenants = () => {
   const { user } = useAuth();
@@ -309,37 +308,27 @@ const OwnerTenants = () => {
                   <div className="w-full xl:w-auto pt-4 xl:pt-0">
                     <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-inner-sm">
                       <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-3 text-center">Status Action</p>
-                      <div className="flex flex-col sm:flex-row xl:flex-row items-stretch sm:items-center gap-2">
-                        <CustomDropdown 
-                          className="w-full sm:w-36"
-                          options={[
-                            { label: "CONFIRMED", value: "CONFIRMED" },
-                            { label: "PENDING", value: "PENDING" },
-                            { label: "CANCELLED", value: "CANCELLED" }
-                          ]}
-                          value={selectedStatus[b.id] || b.status}
-                          onChange={(e) => setSelectedStatus(prev => ({ ...prev, [b.id]: e.target.value }))}
-                          name="status"
-                        />
-                        <button 
-                          onClick={() => handleUpdateStatus(b.id, selectedStatus[b.id] || b.status)}
-                          disabled={updatingId === b.id || (selectedStatus[b.id] || b.status) === b.status}
-                          className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest ${
-                            (selectedStatus[b.id] || b.status) === b.status 
-                            ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed" 
-                            : "bg-[#5A45FF] text-white hover:bg-[#4633e6] shadow-lg shadow-[#5A45FF]/20 active:scale-95"
-                          }`}
-                        >
-                          {updatingId === b.id ? (
-                            <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          ) : (
-                            <>
-                              <PiCheckCircle size={18} weight="black" />
-                              <span>Update</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
+                        {b.status !== "CANCELLED" ? (
+                          <button 
+                            onClick={() => handleUpdateStatus(b.id, "CANCELLED")}
+                            disabled={updatingId === b.id}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-rose-500 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-rose-600 shadow-lg shadow-rose-500/25 transition-all active:scale-95"
+                          >
+                            {updatingId === b.id ? (
+                              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                              <>
+                                <PiXCircle size={20} weight="black" />
+                                <span>Cancel Booking</span>
+                              </>
+                            )}
+                          </button>
+                        ) : (
+                          <div className="px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-2xl font-black text-[11px] uppercase tracking-widest flex items-center gap-2">
+                            <PiXCircle size={20} />
+                            <span>Cancelled</span>
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>
