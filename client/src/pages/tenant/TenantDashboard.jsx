@@ -11,7 +11,7 @@ const TenantDashboard = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white tracking-tight">
-              Welcome back, {user?.username || "Tenant"}! 👋
+              Welcome, {user?.username || "Tenant"}! 👋
             </h1>
             <p className="mt-2 text-text-sub-light dark:text-text-sub-dark text-lg">
               Here's what's happening with your accommodation today.

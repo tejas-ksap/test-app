@@ -35,7 +35,7 @@ const Login = () => {
       const userData = userRes.data;
 
       login(token, userData);
-      toast.success("Welcome back, " + (userData.fullName || userData.username) + "!");
+      toast.success("Welcome, " + (userData.fullName || userData.username) + "!");
 
       const role = userData.userType;
       if (role === "ADMIN") navigate("/admin/dashboard");
@@ -65,7 +65,7 @@ const Login = () => {
         const googleUser = await googleUserRes.json();
 
         // Send the access_token and user info to our backend
-        const res = await api.post("/api/auth/google", { 
+        const res = await api.post("/api/auth/google", {
           accessToken: tokenResponse.access_token,
           email: googleUser.email,
           name: googleUser.name,
@@ -105,19 +105,19 @@ const Login = () => {
   return (
     <>
       <div className="mb-8 mt-2">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2 font-display">Welcome back</h1>
-        <p className="text-gray-500 text-sm">Please enter your details to sign in.</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 font-display">Welcome</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">Please enter your details to sign in.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm border border-red-100 dark:border-red-800">
             {error}
           </div>
         )}
 
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700" htmlFor="username">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="username">
             Username
           </label>
           <input
@@ -127,13 +127,13 @@ const Login = () => {
             required
             value={formData.username}
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
             placeholder="johndoe"
           />
         </div>
 
         <div className="space-y-1.5 relative">
-          <label className="block text-sm font-medium text-gray-700" htmlFor="password">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="password">
             Password
           </label>
           <div className="relative">
@@ -144,12 +144,12 @@ const Login = () => {
               required
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
+              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
               placeholder="••••••••"
             />
             <button
               type="button"
-              className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
               onClick={() => setShowPassword(!showPassword)}
             >
               <span className="material-icons-outlined text-xl">
@@ -166,13 +166,13 @@ const Login = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
-                className="peer appearance-none w-5 h-5 border border-gray-300 rounded-full bg-white checked:bg-[#5A45FF] checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#5A45FF]/50 transition-all cursor-pointer"
+                className="peer appearance-none w-5 h-5 border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-800 checked:bg-[#5A45FF] checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#5A45FF]/50 transition-all cursor-pointer"
               />
               <span className="material-icons-outlined text-white text-[12px] absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
                 check
               </span>
             </div>
-            <label htmlFor="remember-me" className="ml-2.5 block text-sm text-gray-700 cursor-pointer">
+            <label htmlFor="remember-me" className="ml-2.5 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
               Remember me
             </label>
           </div>
@@ -194,21 +194,21 @@ const Login = () => {
 
         <div className="relative py-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
+            <div className="w-full border-t border-gray-200 dark:border-gray-600"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-gray-500 font-medium text-[13px]">
+            <span className="px-4 bg-white dark:bg-card-dark text-gray-500 dark:text-gray-400 font-medium text-[13px]">
               Or continue with
             </span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4">
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => handleGoogleLogin()}
             disabled={googleLoading}
-            className="flex items-center justify-center py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex items-center justify-center py-2.5 px-4 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {googleLoading ? (
               <>
@@ -228,7 +228,7 @@ const Login = () => {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Don't have an account?{" "}
             <Link to="/register" className="font-semibold text-[#5A45FF] hover:text-[#4633e6] transition-colors">
               Register

@@ -32,7 +32,7 @@ const OwnerDashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              Welcome back, {user?.fullName || "Owner"}
+              Welcome, {user?.fullName || "Owner"}
               <span className="text-2xl animate-pulse">👋</span>
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-lg mt-1">

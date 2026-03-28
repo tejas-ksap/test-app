@@ -10,7 +10,7 @@ const AdminDashboard = () => {
       <main className="max-w-7xl mx-auto p-6 space-y-8">
         <div>
           <h2 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-2">
-            Welcome back, {user?.username || "Admin"}!
+            Welcome, {user?.username || "Admin"}!
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-lg">
             Here's what's happening with your properties today.
