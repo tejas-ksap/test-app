@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import NotificationBell from "./common/NotificationBell";
+import { googleLogout } from "@react-oauth/google";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -31,6 +32,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
+    googleLogout();
     logout();
     navigate("/login");
   };

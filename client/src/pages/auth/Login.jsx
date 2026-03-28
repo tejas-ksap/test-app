@@ -3,6 +3,7 @@ import api from "../../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) =>
@@ -49,6 +51,56 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  const handleGoogleLogin = useGoogleLogin({
+    flow: "implicit",
+    onSuccess: async (tokenResponse) => {
+      setGoogleLoading(true);
+      setError("");
+      try {
+        // Get user info from Google using the access token
+        const googleUserRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const googleUser = await googleUserRes.json();
+
+        // Send the access_token and user info to our backend
+        const res = await api.post("/api/auth/google", { 
+          accessToken: tokenResponse.access_token,
+          email: googleUser.email,
+          name: googleUser.name,
+          picture: googleUser.picture
+        });
+        const token = res.data.token;
+
+        const userRes = await api.get("/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const userData = userRes.data;
+
+        login(token, userData);
+        toast.success("Welcome, " + (userData.fullName || userData.username) + "!");
+
+        const role = userData.userType;
+        if (role === "ADMIN") navigate("/admin/dashboard");
+        else if (role === "OWNER") navigate("/owner/dashboard");
+        else if (role === "TENANT") navigate("/tenant/dashboard");
+        else navigate("/");
+      } catch (err) {
+        console.error("Google login error:", err);
+        const message = err.response?.data?.message || err.response?.data || "Google sign-in failed. Please try again.";
+        setError(message);
+        toast.error(message);
+      } finally {
+        setGoogleLoading(false);
+      }
+    },
+    onError: (error) => {
+      console.error("Google OAuth error:", error);
+      setError("Google sign-in was cancelled or failed.");
+      toast.error("Google sign-in failed. Please try again.");
+    },
+  });
 
   return (
     <>
@@ -151,14 +203,27 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <button type="button" className="flex items-center justify-center py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5 mr-2" />
-            Google
-          </button>
-          <button type="button" className="flex items-center justify-center py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" className="h-5 w-5 mr-2" />
-            Facebook
+        <div className="grid grid-cols-1 gap-4">
+          <button 
+            type="button" 
+            onClick={() => handleGoogleLogin()}
+            disabled={googleLoading}
+            className="flex items-center justify-center py-2.5 px-4 border border-gray-200 rounded-xl bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {googleLoading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing in...
+              </>
+            ) : (
+              <>
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-5 w-5 mr-2" />
+                Google
+              </>
+            )}
           </button>
         </div>
 

@@ -24,6 +24,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
     private static final List<String> openEndpoints = List.of(
             "/api/auth/login",
             "/api/auth/register",
+            "/api/auth/google",
             "/api/pg-properties",
             "/api/users/images"
     );
