@@ -64,32 +64,76 @@ const PgDetails = () => {
       return;
     }
 
-    try {
-      const start = new Date(bookingData.moveInDate);
-      if (isNaN(start.getTime())) {
-        toast.error("Invalid move-in date format.");
-        return;
-      }
-      
-      const durationNum = parseInt(bookingData.duration.split(" ")[0]);
-      const end = new Date(start);
-      end.setMonth(end.getMonth() + durationNum);
-
-      const bookingPayload = {
-        userId: user.userid || user.id,
-        pgId: parseInt(id),
-        startDate: start.toISOString().substring(0, 19),
-        endDate: end.toISOString().substring(0, 19),
-        bookingDate: new Date().toISOString().substring(0, 19),
-        status: "PENDING"
-      };
-
-      await api.post("/api/bookings", bookingPayload);
-      toast.success("Booking request sent successfully!");
-    } catch (err) {
-      console.error("Booking error:", err);
-      toast.error(err.response?.data?.message || "Failed to process booking request.");
+    const start = new Date(bookingData.moveInDate);
+    if (isNaN(start.getTime())) {
+      toast.error("Invalid move-in date format.");
+      return;
     }
+
+    const durationNum = parseInt(bookingData.duration.split(" ")[0]);
+    const totalAmount = price * durationNum;
+
+    // Razorpay Checkout options
+    const options = {
+      key: "rzp_test_a3UwgCaHBzhc21",
+      amount: totalAmount * 100, // Razorpay expects amount in paise
+      currency: "INR",
+      name: "PG Accommodations",
+      description: `Booking for ${pg.name} — ${bookingData.duration}`,
+      image: "https://cdn-icons-png.flaticon.com/512/2311/2311524.png",
+      handler: async function (response) {
+        // Payment successful — create booking with payment reference
+        try {
+          const end = new Date(start);
+          end.setMonth(end.getMonth() + durationNum);
+
+          // Helper to format date for LocalDateTime (YYYY-MM-DDTHH:mm:ss)
+          const formatDate = (date) => {
+            const pad = (n) => n.toString().padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+          };
+
+          const bookingPayload = {
+            userId: user.userid || user.id,
+            pgId: parseInt(id),
+            startDate: formatDate(start),
+            endDate: formatDate(end),
+            bookingDate: formatDate(new Date()),
+            status: "PENDING",
+            razorpayPaymentId: response.razorpay_payment_id,
+            amount: totalAmount
+          };
+
+          console.log("Sending booking payload:", bookingPayload);
+          await api.post("/api/bookings", bookingPayload);
+          toast.success("Payment successful! Booking request sent.");
+        } catch (err) {
+          console.error("Booking error after payment:", err);
+          const errorMsg = err.response?.data?.message || err.message;
+          toast.error(`Payment succeeded but booking failed: ${errorMsg}. Please contact support.`);
+        }
+      },
+      prefill: {
+        name: user.fullName || user.username,
+        email: user.email || "",
+        contact: user.phone || ""
+      },
+      theme: {
+        color: "#5A45FF"
+      },
+      modal: {
+        ondismiss: function () {
+          toast.info("Payment cancelled. Booking was not created.");
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      toast.error("Payment failed: " + (response.error.description || "Please try again."));
+    });
+    rzp.open();
   };
 
   if (loading) {
@@ -352,10 +396,10 @@ const PgDetails = () => {
                 onClick={handleBookNow}
                 className="w-full bg-[#5A45FF] hover:bg-[#4633e6] text-white text-lg py-5 rounded-[1.25rem] font-bold shadow-xl shadow-[#5A45FF]/20 transition-all active:scale-[0.98]"
               >
-                Request to Book
+                Pay & Book
               </button>
 
-              <p className="text-center text-xs text-gray-400 mt-4">You won't be charged yet</p>
+              <p className="text-center text-xs text-gray-400 mt-4">Secure payment powered by Razorpay</p>
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
