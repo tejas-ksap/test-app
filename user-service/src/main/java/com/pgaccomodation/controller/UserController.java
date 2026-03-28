@@ -39,8 +39,8 @@ public class UserController {
         return ResponseEntity.ok(registered);
     }
 
-    // Only ADMIN can get user by ID
-    @PreAuthorize("hasRole('ADMIN')")
+    // Anyone authenticated can get user by ID (needed for owner contacts)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
         Optional<User> user = userService.getUserById(id);

@@ -16,6 +16,8 @@ import com.pgaccomodation.bookingservice.exception.ResourceNotFoundException;
 import com.pgaccomodation.bookingservice.exception.UnauthorizedAccessException;
 import com.pgaccomodation.bookingservice.repository.BookingRepository;
 import com.pgaccomodation.bookingservice.repository.PgPropertyRepository;
+import com.pgaccomodation.bookingservice.repository.PaymentRepository;
+import com.pgaccomodation.bookingservice.entity.Payment;
 import com.pgaccomodation.bookingservice.service.BookingService;
 import com.pgaccomodation.bookingservice.client.NotificationClient;
 
@@ -29,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
 
 	private final BookingRepository bookingRepository;
 	private final PgPropertyRepository pgPropertyRepository;
+	private final PaymentRepository paymentRepository;
 	private final NotificationClient notificationClient;
 
 	@Override
@@ -43,6 +46,19 @@ public class BookingServiceImpl implements BookingService {
 				"New booking request for '%s' (Booking ID: %d). Please review and confirm.",
 				pg.getName(), saved.getId());
 			notificationClient.sendNotification(pg.getOwnerId(), msg);
+
+			// Log the payment if it exists
+			if (booking.getRazorpayPaymentId() != null) {
+				Payment payment = Payment.builder()
+						.userId(booking.getUserId())
+						.pgId(booking.getPgId())
+						.amount(booking.getAmount())
+						.paymentDate(LocalDateTime.now())
+						.razorpayPaymentId(booking.getRazorpayPaymentId())
+						.status("SUCCESS")
+						.build();
+				paymentRepository.save(payment);
+			}
 		});
 
 		return saved;
