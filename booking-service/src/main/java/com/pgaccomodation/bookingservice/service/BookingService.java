@@ -17,7 +17,7 @@ public interface BookingService {
     void updateBookingStatus(Integer bookingId, String status);
     public List<Booking> getBookingsByPgIdAndOwner(Integer pgId, Integer ownerId);
     //List<BookingDetails> getBookingsByPgAndOwner(Integer pgId, Integer ownerId);
-    //List<BookingWithUsername> getBookingsWithUsernames(Integer pgId);
+    List<BookingWithUsername> getBookingsWithUsernames(Integer pgId);
     public List<BookingWithUsername> getBookingsWithUserInfoByPgId(Integer pgId, Integer ownerId);
     List<BookingResponseDTO> getEnrichedBookingsByUserId(Integer userId);
 

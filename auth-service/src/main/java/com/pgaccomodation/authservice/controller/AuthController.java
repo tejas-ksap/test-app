@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.pgaccomodation.authservice.dto.AuthRequest;
 import com.pgaccomodation.authservice.dto.AuthResponse;
+import com.pgaccomodation.authservice.dto.GoogleAuthRequest;
 import com.pgaccomodation.authservice.dto.RegisterRequest;
 import com.pgaccomodation.authservice.service.AuthService;
 
@@ -26,5 +27,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleLogin(@RequestBody GoogleAuthRequest request) {
+        return ResponseEntity.ok(authService.googleLogin(request));
     }
 }

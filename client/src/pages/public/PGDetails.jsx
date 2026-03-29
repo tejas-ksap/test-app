@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import WishlistButton from "../../components/common/WishlistButton";
+import ReviewSection from "../../components/common/ReviewSection";
+import { PiArrowLeft, PiMapPinFill, PiStarFill, PiWifiHigh, PiSnowflake, PiWashingMachine, PiBarbell, PiShieldCheck, PiCookingPot, PiCaretRight, PiCaretLeft, PiX } from "react-icons/pi";
 
 const PgDetails = () => {
   const { id } = useParams();
@@ -10,6 +13,8 @@ const PgDetails = () => {
   const { user } = useAuth();
   const [pg, setPg] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [otherPgs, setOtherPgs] = useState([]);
   const [bookingData, setBookingData] = useState({
     roomType: "",
@@ -19,6 +24,9 @@ const PgDetails = () => {
   });
 
   useEffect(() => {
+    setGalleryIndex(0);
+    setShowGallery(false);
+    
     const fetchPg = async () => {
       try {
         const res = await api.get(`/api/pg-properties/${id}`);
@@ -44,13 +52,88 @@ const PgDetails = () => {
     fetchPg();
   }, [id]);
 
-  const handleBookNow = () => {
+  const handleBookNow = async () => {
     if (!user) {
       toast.error("Please login to book a PG.");
       navigate("/login");
       return;
     }
-    toast.success("Booking request sent!");
+
+    if (!bookingData.moveInDate) {
+      toast.error("Please select a move-in date.");
+      return;
+    }
+
+    const start = new Date(bookingData.moveInDate);
+    if (isNaN(start.getTime())) {
+      toast.error("Invalid move-in date format.");
+      return;
+    }
+
+    const durationNum = parseInt(bookingData.duration.split(" ")[0]);
+    const totalAmount = price * durationNum;
+
+    // Razorpay Checkout options
+    const options = {
+      key: "rzp_test_a3UwgCaHBzhc21",
+      amount: totalAmount * 100, // Razorpay expects amount in paise
+      currency: "INR",
+      name: "PG Accommodations",
+      description: `Booking for ${pg.name} — ${bookingData.duration}`,
+      image: "https://cdn-icons-png.flaticon.com/512/2311/2311524.png",
+      handler: async function (response) {
+        // Payment successful — create booking with payment reference
+        try {
+          const end = new Date(start);
+          end.setMonth(end.getMonth() + durationNum);
+
+          // Helper to format date for LocalDateTime (YYYY-MM-DDTHH:mm:ss)
+          const formatDate = (date) => {
+            const pad = (n) => n.toString().padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+          };
+
+          const bookingPayload = {
+            userId: user.userid || user.id,
+            pgId: parseInt(id),
+            startDate: formatDate(start),
+            endDate: formatDate(end),
+            bookingDate: formatDate(new Date()),
+            status: "PENDING",
+            razorpayPaymentId: response.razorpay_payment_id,
+            amount: totalAmount
+          };
+
+          console.log("Sending booking payload:", bookingPayload);
+          await api.post("/api/bookings", bookingPayload);
+          toast.success("Payment successful! Booking request sent.");
+        } catch (err) {
+          console.error("Booking error after payment:", err);
+          const errorMsg = err.response?.data?.message || err.message;
+          toast.error(`Payment succeeded but booking failed: ${errorMsg}. Please contact support.`);
+        }
+      },
+      prefill: {
+        name: user.fullName || user.username,
+        email: user.email || "",
+        contact: user.phone || ""
+      },
+      theme: {
+        color: "#5A45FF"
+      },
+      modal: {
+        ondismiss: function () {
+          toast.info("Payment cancelled. Booking was not created.");
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      console.error("Payment failed:", response.error);
+      toast.error("Payment failed: " + (response.error.description || "Please try again."));
+    });
+    rzp.open();
   };
 
   if (loading) {
@@ -83,7 +166,7 @@ const PgDetails = () => {
             onClick={() => navigate(-1)}
             className="flex items-center text-gray-600 hover:text-gray-900 transition font-medium"
           >
-            <span className="material-icons-outlined mr-2">arrow_back</span>
+            <PiArrowLeft className="text-xl mr-2" />
             Back
           </button>
         </div>
@@ -96,12 +179,12 @@ const PgDetails = () => {
             </h1>
             <div className="flex flex-wrap items-center gap-y-2 text-gray-600 dark:text-gray-400">
               <div className="flex items-center">
-                <span className="material-icons-outlined text-[#5A45FF] mr-1.5 text-xl">place</span>
+                <PiMapPinFill className="text-[#5A45FF] mr-1.5 text-2xl" />
                 <span className="text-base font-medium">{pg.address}, {pg.city}</span>
               </div>
               <span className="hidden md:inline mx-3 text-gray-300">•</span>
               <div className="flex items-center">
-                <span className="material-icons text-yellow-400 mr-1.5">star</span>
+                <PiStarFill className="text-yellow-400 text-xl mr-1.5" />
                 <span className="font-bold text-gray-900 dark:text-white mr-1">{pg.rating?.parsedValue ?? pg.rating ?? "4.8"}</span>
                 <span className="text-sm">(120 reviews)</span>
               </div>
@@ -111,19 +194,39 @@ const PgDetails = () => {
 
         {/* Gallery Section */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 h-[400px] md:h-[550px] mb-12">
-          <div className="md:col-span-8 h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
+          <div 
+            className="md:col-span-8 h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-sm relative cursor-pointer group"
+            onClick={() => { if (pg.images && pg.images.length > 0) { setGalleryIndex(0); setShowGallery(true); } }}
+          >
             <img
-              src={pg.imageUrl || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80"}
+              src={!pg.images || pg.images.length === 0 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80" : pg.images[0].startsWith('http') ? pg.images[0] : `${api.defaults.baseURL}/api/users/images/${pg.images[0]}`}
               alt="Main"
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-700"
+              className="w-full h-full object-cover transition-transform group-hover:scale-[1.02] duration-700"
             />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+            <WishlistButton pgId={id} className="right-4 top-4 w-12 h-12 flex items-center justify-center text-primary hover:text-red-500 z-10 box-content p-2" />
           </div>
           <div className="hidden md:flex md:col-span-4 flex-col gap-4 h-full">
-            <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
-              <img src="https://images.unsplash.com/photo-1502672260266-1c1f56a6428c?auto=format&fit=crop&w=800&q=80" alt="Interior 1" className="w-full h-full object-cover" />
+            <div 
+              className="h-1/2 rounded-3xl overflow-hidden shadow-sm relative cursor-pointer group"
+              onClick={() => { if (pg.images && pg.images.length > 0) { setGalleryIndex(Math.min(1, pg.images.length - 1)); setShowGallery(true); } }}
+            >
+              <img src={!pg.images || pg.images.length <= 1 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" : pg.images[1].startsWith('http') ? pg.images[1] : `${api.defaults.baseURL}/api/users/images/${pg.images[1]}`} alt="Interior 1" className="w-full h-full object-cover transition-transform group-hover:scale-[1.03] duration-700" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
             </div>
-            <div className="h-1/2 rounded-3xl overflow-hidden shadow-sm">
-              <img src="https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=800&q=80" alt="Interior 2" className="w-full h-full object-cover" />
+            <div 
+              className="h-1/2 rounded-3xl overflow-hidden shadow-sm relative cursor-pointer group"
+              onClick={() => { if (pg.images && pg.images.length > 0) { setGalleryIndex(Math.min(2, pg.images.length - 1)); setShowGallery(true); } }}
+            >
+              <img src={!pg.images || pg.images.length <= 2 ? "https://images.unsplash.com/photo-1560448205-4d9b3e6bb6db?auto=format&fit=crop&w=800&q=80" : pg.images[2].startsWith('http') ? pg.images[2] : `${api.defaults.baseURL}/api/users/images/${pg.images[2]}`} alt="Interior 2" className="w-full h-full object-cover transition-transform group-hover:scale-[1.03] duration-700" />
+              {pg.images && pg.images.length > 3 && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/50 transition-colors duration-300">
+                  <span className="text-white font-bold text-xl tracking-wide">+{pg.images.length - 3} Photos</span>
+                </div>
+              )}
+              {pg.images && pg.images.length <= 3 && (
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+              )}
             </div>
           </div>
         </div>
@@ -152,43 +255,43 @@ const PgDetails = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-8">
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">wifi</span>
+                    <PiWifiHigh className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">High-speed Wifi</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">ac_unit</span>
+                    <PiSnowflake className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">Air Conditioning</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">local_laundry_service</span>
+                    <PiWashingMachine className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">On-site Laundry</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">fitness_center</span>
+                    <PiBarbell className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">Gym Access</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">security</span>
+                    <PiShieldCheck className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">24/7 Security</span>
                 </div>
                 <div className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-400 group-hover:bg-[#5A45FF]/10 group-hover:text-[#5A45FF] transition-colors">
-                    <span className="material-icons-outlined text-xl">countertops</span>
+                    <PiCookingPot className="text-2xl" />
                   </div>
                   <span className="text-lg text-gray-700 dark:text-gray-300">Shared Kitchen</span>
                 </div>
               </div>
               <button className="mt-8 text-[#5A45FF] font-bold text-sm tracking-wide uppercase flex items-center hover:opacity-80 transition-opacity">
-                Show all 24 amenities <span className="material-icons-outlined ml-1.5 text-sm">chevron_right</span>
+                Show all 24 amenities <PiCaretRight className="ml-1 text-lg" />
               </button>
             </div>
 
@@ -207,7 +310,7 @@ const PgDetails = () => {
                     >
                       <div className="w-full sm:w-48 h-32 rounded-2xl overflow-hidden shrink-0">
                         <img
-                          src={other.imageUrl || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80"}
+                          src={!other.images || other.images.length === 0 ? "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=400&q=80" : other.images[0].startsWith('http') ? other.images[0] : `${api.defaults.baseURL}/api/users/images/${other.images[0]}`}
                           alt={other.name}
                           className="w-full h-full object-cover"
                         />
@@ -229,6 +332,9 @@ const PgDetails = () => {
                 </div>
               </div>
             )}
+
+            {/* Review Section */}
+            <ReviewSection pgId={id} />
           </div>
 
           {/* Sticky Booking Card (Right) */}
@@ -239,10 +345,17 @@ const PgDetails = () => {
                   <p className="text-sm text-gray-500 mb-1">Starting from</p>
                   <p className="text-4xl font-extrabold text-gray-900 dark:text-white">₹{price.toLocaleString()}<span className="text-lg text-gray-400 font-medium"> / mo</span></p>
                 </div>
-                <div className="flex items-center gap-1.5 bg-yellow-50 px-2 py-1 rounded-lg">
-                  <span className="material-icons text-yellow-500 text-sm">star</span>
+                <div className="flex items-center gap-1.5 bg-yellow-50 px-2 py-1 rounded-lg border border-yellow-100">
+                  <PiStarFill className="text-yellow-500 text-lg" />
                   <span className="text-sm font-bold text-yellow-700">{pg.rating?.parsedValue ?? pg.rating ?? "4.8"}</span>
                 </div>
+              </div>
+
+              <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-between border border-gray-100 dark:border-gray-700">
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Availability</p>
+                <p className={`text-sm font-black uppercase ${pg.availableRooms > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                  {pg.availableRooms > 0 ? `${pg.availableRooms} / ${pg.totalRooms || 10} Vacant` : 'Fully Booked'}
+                </p>
               </div>
 
               <div className="space-y-5 mb-8">
@@ -288,17 +401,22 @@ const PgDetails = () => {
 
               <button
                 onClick={handleBookNow}
-                className="w-full bg-[#5A45FF] hover:bg-[#4633e6] text-white text-lg py-5 rounded-[1.25rem] font-bold shadow-xl shadow-[#5A45FF]/20 transition-all active:scale-[0.98]"
+                disabled={pg.availableRooms <= 0}
+                className={`w-full text-lg py-5 rounded-[1.25rem] font-bold shadow-xl transition-all active:scale-[0.98] ${
+                  pg.availableRooms > 0 
+                  ? "bg-[#5A45FF] hover:bg-[#4633e6] text-white shadow-[#5A45FF]/20" 
+                  : "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed shadow-none"
+                }`}
               >
-                Request to Book
+                {pg.availableRooms > 0 ? "Pay & Book" : "Fully Booked"}
               </button>
 
-              <p className="text-center text-xs text-gray-400 mt-4">You won't be charged yet</p>
+              <p className="text-center text-xs text-gray-400 mt-4">Secure payment powered by Razorpay</p>
 
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                  <span className="underline cursor-help">Rent x 1 month</span>
-                  <span>₹{price.toLocaleString()}</span>
+                  <span className="underline cursor-help">Rent x {bookingData.duration}</span>
+                  <span>₹{(price * parseInt(bookingData.duration.split(" ")[0])).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span className="underline cursor-help">Service fee</span>
@@ -306,7 +424,7 @@ const PgDetails = () => {
                 </div>
                 <div className="flex justify-between text-base font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-50 dark:border-gray-800">
                   <span>Total (INR)</span>
-                  <span>₹{price.toLocaleString()}</span>
+                  <span>₹{(price * parseInt(bookingData.duration.split(" ")[0])).toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -315,6 +433,82 @@ const PgDetails = () => {
         </div>
 
       </div>
+
+      {/* Lightbox Modal Overlay */}
+      {showGallery && pg.images && (
+        <div className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
+          
+          {/* Centered Modal Container */}
+          <div className="bg-white dark:bg-[#1a1a24] w-full max-w-5xl rounded-[1.5rem] flex flex-col relative overflow-hidden ring-1 ring-gray-200 dark:ring-white/10 shadow-2xl">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center p-4 md:px-6 border-b border-gray-100 dark:border-white/5">
+              <h3 className="text-gray-900 dark:text-white font-bold text-lg tracking-tight">
+                {galleryIndex + 1} / {pg.images.length} Photos
+              </h3>
+              <button 
+                onClick={() => setShowGallery(false)}
+                className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 transition"
+              >
+                <PiX className="text-2xl" />
+              </button>
+            </div>
+
+            {/* Main Focused Image & Controls */}
+            <div className="relative w-full h-[50vh] md:h-[65vh] bg-gray-50 dark:bg-black/40 flex items-center justify-center group p-4">
+              
+              {/* Left Button */}
+              <button 
+                onClick={() => setGalleryIndex(prev => Math.max(0, prev - 1))}
+                disabled={galleryIndex === 0}
+                className={`absolute left-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black flex items-center justify-center text-gray-800 dark:text-white transition z-20 border border-gray-200 dark:border-white/10 shadow-sm ${galleryIndex === 0 ? 'opacity-30 cursor-not-allowed hidden md:flex' : 'opacity-0 group-hover:opacity-100'} -translate-x-2 group-hover:translate-x-0`}
+              >
+                <PiCaretLeft className="text-2xl" />
+              </button>
+              
+              {/* Spotlight Image */}
+              <div className="w-full h-full flex items-center justify-center outline-none">
+                {pg.images[galleryIndex] && (
+                  <img 
+                     src={pg.images[galleryIndex].startsWith('http') ? pg.images[galleryIndex] : `${api.defaults.baseURL}/api/users/images/${pg.images[galleryIndex]}`} 
+                     alt={`HD View ${galleryIndex + 1}`}
+                     className="max-w-full max-h-full object-contain rounded-md select-none"
+                  />
+                )}
+              </div>
+
+              {/* Right Button */}
+              <button 
+                onClick={() => setGalleryIndex(prev => Math.min(pg.images.length - 1, prev + 1))}
+                disabled={galleryIndex === pg.images.length - 1}
+                className={`absolute right-4 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 dark:bg-black/60 hover:bg-white dark:hover:bg-black flex items-center justify-center text-gray-800 dark:text-white transition z-20 border border-gray-200 dark:border-white/10 shadow-sm ${galleryIndex === pg.images.length - 1 ? 'opacity-30 cursor-not-allowed hidden md:flex' : 'opacity-0 group-hover:opacity-100'} translate-x-2 group-hover:translate-x-0`}
+              >
+                <PiCaretRight className="text-2xl" />
+              </button>
+            </div>
+
+            {/* Thumbnails Action Ribbon */}
+            <div className="bg-white dark:bg-[#1a1a24] p-4 shrink-0 overflow-x-auto hide-scrollbar border-t border-gray-100 dark:border-white/5">
+              <div className="flex gap-3 justify-start md:justify-center min-w-min mx-auto w-max px-2">
+                {pg.images.map((img, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => setGalleryIndex(idx)}
+                    className={`flex-shrink-0 relative overflow-hidden rounded-lg border-2 transition-all duration-300 outline-none ${galleryIndex === idx ? 'border-[#5A45FF] dark:border-white scale-105' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                  >
+                    <img 
+                      src={img.startsWith('http') ? img : `${api.defaults.baseURL}/api/users/images/${img}`} 
+                      alt={`Thumbnail ${idx + 1}`} 
+                      className="w-16 h-16 md:w-20 md:h-20 object-cover pointer-events-none rounded-md"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };

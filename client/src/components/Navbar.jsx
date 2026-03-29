@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
+import NotificationBell from "./common/NotificationBell";
+import { googleLogout } from "@react-oauth/google";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -30,6 +32,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
+    googleLogout();
     logout();
     navigate("/login");
   };
@@ -46,6 +49,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <NotificationBell />
             <button onClick={toggleDarkMode} className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
               <span className="material-icons-outlined text-xl">{isDark ? "light_mode" : "dark_mode"}</span>
             </button>

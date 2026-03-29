@@ -39,8 +39,8 @@ public class UserController {
         return ResponseEntity.ok(registered);
     }
 
-    // Only ADMIN can get user by ID
-    @PreAuthorize("hasRole('ADMIN')")
+    // Anyone authenticated can get user by ID (needed for owner contacts)
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
         Optional<User> user = userService.getUserById(id);
@@ -90,6 +90,19 @@ public class UserController {
         String username = jwtUtil.extractUsername(token);
         return userService.getUserByUsername(username)
                 .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/me")
+    public ResponseEntity<User> updateCurrentUser(HttpServletRequest request, @RequestBody User updatedUser) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        String username = jwtUtil.extractUsername(token);
+        return userService.getUserByUsername(username)
+                .map(currentUser -> {
+                    User user = userService.updateUser(currentUser.getUserid(), updatedUser);
+                    return ResponseEntity.ok(user);
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 

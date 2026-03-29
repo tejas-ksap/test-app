@@ -42,4 +42,8 @@ public class Booking {
     private LocalDateTime bookingDate;
 
     private String status; // PENDING, CONFIRMED, etc.
+
+    private String razorpayPaymentId;
+
+    private Double amount;
 }

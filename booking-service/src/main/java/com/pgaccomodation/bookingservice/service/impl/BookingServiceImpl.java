@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.pgaccomodation.bookingservice.dto.BookingResponseDTO;
 import com.pgaccomodation.bookingservice.dto.BookingWithUsername;
@@ -17,23 +16,61 @@ import com.pgaccomodation.bookingservice.exception.ResourceNotFoundException;
 import com.pgaccomodation.bookingservice.exception.UnauthorizedAccessException;
 import com.pgaccomodation.bookingservice.repository.BookingRepository;
 import com.pgaccomodation.bookingservice.repository.PgPropertyRepository;
+import com.pgaccomodation.bookingservice.repository.PaymentRepository;
+import com.pgaccomodation.bookingservice.entity.Payment;
 import com.pgaccomodation.bookingservice.service.BookingService;
+import com.pgaccomodation.bookingservice.client.NotificationClient;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingServiceImpl implements BookingService {
 
 	private final BookingRepository bookingRepository;
-	private final PgPropertyRepository pgPropertyRepository; // ✅ MUST BE FINAL
-	private final RestTemplate restTemplate;
+	private final PgPropertyRepository pgPropertyRepository;
+	private final PaymentRepository paymentRepository;
+	private final NotificationClient notificationClient;
 
 	@Override
 	public Booking createBooking(Booking booking) {
+		PgProperty pg = pgPropertyRepository.findById(booking.getPgId())
+				.orElseThrow(() -> new ResourceNotFoundException("PG not found with id " + booking.getPgId()));
+
+		if (pg.getAvailableRooms() <= 0) {
+			throw new IllegalStateException("No vacancies available for this PG property.");
+		}
+
+		// Decrement vacancy
+		pg.setAvailableRooms(pg.getAvailableRooms() - 1);
+		pgPropertyRepository.save(pg);
+
 		booking.setBookingDate(LocalDateTime.now());
-		booking.setStatus("PENDING");
-		return bookingRepository.save(booking);
+		booking.setStatus("CONFIRMED"); // Auto-confirm
+		Booking saved = bookingRepository.save(booking);
+
+		// Notify the PG owner about the new booking
+		String msg = String.format(
+			"New guaranteed booking for '%s' (Booking ID: %d). Tenant: %d.",
+			pg.getName(), saved.getId(), booking.getUserId());
+		notificationClient.sendNotification(pg.getOwnerId(), msg);
+
+		// Log the payment if it exists
+		if (booking.getRazorpayPaymentId() != null) {
+			Payment payment = Payment.builder()
+					.userId(booking.getUserId())
+					.pgId(booking.getPgId())
+					.amount(booking.getAmount())
+					.paymentDate(LocalDateTime.now())
+					.razorpayPaymentId(booking.getRazorpayPaymentId())
+					.status("SUCCESS")
+					.build();
+			paymentRepository.save(payment);
+		}
+
+		return saved;
 	}
 
 	@Override
@@ -59,8 +96,21 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	public void cancelBooking(Integer id) {
 		bookingRepository.findById(id).ifPresent(booking -> {
-			booking.setStatus("CANCELLED");
-			bookingRepository.save(booking);
+			if (!"CANCELLED".equalsIgnoreCase(booking.getStatus())) {
+				booking.setStatus("CANCELLED");
+				bookingRepository.save(booking);
+
+				// Increment vacancy back
+				pgPropertyRepository.findById(booking.getPgId()).ifPresent(pg -> {
+					pg.setAvailableRooms(pg.getAvailableRooms() + 1);
+					pgPropertyRepository.save(pg);
+
+					String msg = String.format(
+						"Booking ID %d for '%s' has been cancelled. One vacancy has been restored.",
+						id, pg.getName());
+					notificationClient.sendNotification(pg.getOwnerId(), msg);
+				});
+			}
 		});
 	}
 
@@ -69,14 +119,38 @@ public class BookingServiceImpl implements BookingService {
 		Booking booking = bookingRepository.findById(bookingId)
 				.orElseThrow(() -> new ResourceNotFoundException("Booking not found with id " + bookingId));
 
-		List<String> allowedStatuses = List.of("PENDING", "CONFIRMED", "CANCELLED");
+		String oldStatus = booking.getStatus();
+		String newStatus = status.toUpperCase();
 
-		if (!allowedStatuses.contains(status.toUpperCase())) {
+		List<String> allowedStatuses = List.of("PENDING", "CONFIRMED", "CANCELLED");
+		if (!allowedStatuses.contains(newStatus)) {
 			throw new IllegalArgumentException("Invalid booking status: " + status);
 		}
 
-		booking.setStatus(status.toUpperCase());
+		if (oldStatus.equals(newStatus)) return;
+
+		booking.setStatus(newStatus);
 		bookingRepository.save(booking);
+
+		// Handle vacancy count changes
+		pgPropertyRepository.findById(booking.getPgId()).ifPresent(pg -> {
+			if ("CANCELLED".equals(newStatus)) {
+				pg.setAvailableRooms(pg.getAvailableRooms() + 1);
+				pgPropertyRepository.save(pg);
+			} else if ("CONFIRMED".equals(newStatus) && "PENDING".equals(oldStatus)) {
+				// This case might happen if we keep some older bookings or for manual overrides
+				if (pg.getAvailableRooms() > 0) {
+					pg.setAvailableRooms(pg.getAvailableRooms() - 1);
+					pgPropertyRepository.save(pg);
+				}
+			}
+
+			// Notify the tenant about the status change
+			String msg = String.format(
+				"Your booking for '%s' (ID: %d) has been updated to: %s.",
+				pg.getName(), bookingId, newStatus);
+			notificationClient.sendNotification(booking.getUserId(), msg);
+		});
 	}
 
 	public List<Booking> getBookingsByPgIdAndOwner(Integer pgId, Integer ownerId) {
@@ -142,6 +216,7 @@ public class BookingServiceImpl implements BookingService {
 	            pgDto.setPgType(pg.getPgType().name());
 	            pgDto.setRating(pg.getRating());
 	            pgDto.setVerified(pg.getVerified());
+	            pgDto.setImages(pg.getImages());
 	            pgDto.setCreatedAt(pg.getCreatedAt());
 	            pgDto.setUpdatedAt(pg.getUpdatedAt());
 
@@ -152,5 +227,9 @@ public class BookingServiceImpl implements BookingService {
 	    }).collect(Collectors.toList());
 	}
 
+	@Override
+	public List<BookingWithUsername> getBookingsWithUsernames(Integer pgId) {
+		return bookingRepository.findBookingsWithUserInfoByPgId(pgId);
+	}
 	
 }

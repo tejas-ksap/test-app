@@ -32,7 +32,7 @@ const OwnerDashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              Welcome back, {user?.fullName || "Owner"}
+              Welcome, {user?.fullName || "Owner"}
               <span className="text-2xl animate-pulse">👋</span>
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-lg mt-1">
@@ -53,63 +53,63 @@ const OwnerDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <Link
             to="/owner/register-pg"
-            className="group bg-white dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden block"
+            className="group bg-white dark:bg-gray-900/50 backdrop-blur-md p-8 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all cursor-pointer relative overflow-hidden block"
           >
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
               <span className="material-icons-outlined text-6xl text-blue-500">add_business</span>
             </div>
             <div className="flex items-center gap-4 mb-4 relative z-10">
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
-                <span className="material-icons-outlined text-2xl">add</span>
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl font-bold">add</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Register New PG</h3>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Register New PG</h3>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 relative z-10">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 relative z-10 font-medium">
               Add a new property to your portfolio and start getting inquiries.
             </p>
-            <span className="text-blue-600 dark:text-blue-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all relative z-10">
+            <span className="text-[#5A45FF] dark:text-[#8E7DFF] text-sm font-black uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all relative z-10">
               Get Started <span className="material-icons-outlined text-sm">arrow_forward</span>
             </span>
           </Link>
 
           <Link
             to="/owner/pg-list"
-            className="group bg-white dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden block"
+            className="group bg-white dark:bg-gray-900/50 backdrop-blur-md p-8 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all cursor-pointer relative overflow-hidden block"
           >
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
               <span className="material-icons-outlined text-6xl text-green-500">apartment</span>
             </div>
             <div className="flex items-center gap-4 mb-4 relative z-10">
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400">
-                <span className="material-icons-outlined text-2xl">list_alt</span>
+              <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-2xl text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl font-bold">list_alt</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">View Listings</h3>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">View Listings</h3>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 relative z-10">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 relative z-10 font-medium">
               Manage your existing properties, update availability, and edit details.
             </p>
-            <span className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all relative z-10">
+            <span className="text-green-600 dark:text-green-400 text-sm font-black uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all relative z-10">
               View All <span className="material-icons-outlined text-sm">arrow_forward</span>
             </span>
           </Link>
 
           <Link
             to="/owner/tenants"
-            className="group bg-white dark:bg-card-dark p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden block"
+            className="group bg-white dark:bg-gray-900/50 backdrop-blur-md p-8 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-2xl hover:shadow-[#5A45FF]/10 transition-all cursor-pointer relative overflow-hidden block"
           >
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
               <span className="material-icons-outlined text-6xl text-purple-500">groups</span>
             </div>
             <div className="flex items-center gap-4 mb-4 relative z-10">
-              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
-                <span className="material-icons-outlined text-2xl">people_outline</span>
+              <div className="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+                <span className="material-icons-outlined text-3xl font-bold">people_outline</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Manage Tenants</h3>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Manage Tenants</h3>
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 relative z-10">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 relative z-10 font-medium">
               View tenant details, manage bookings, and handle requests.
             </p>
-            <span className="text-purple-600 dark:text-purple-400 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all relative z-10">
+            <span className="text-purple-600 dark:text-purple-400 text-sm font-black uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all relative z-10">
               Manage <span className="material-icons-outlined text-sm">arrow_forward</span>
             </span>
           </Link>

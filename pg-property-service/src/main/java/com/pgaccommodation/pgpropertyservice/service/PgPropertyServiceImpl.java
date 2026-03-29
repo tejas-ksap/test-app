@@ -8,6 +8,11 @@ import org.springframework.stereotype.Service;
 import com.pgaccommodation.pgpropertyservice.entity.PgProperty;
 import com.pgaccommodation.pgpropertyservice.exception.ResourceNotFoundException;
 import com.pgaccommodation.pgpropertyservice.repository.PgPropertyRepository;
+import com.pgaccommodation.pgpropertyservice.client.NotificationClient;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 public class PgPropertyServiceImpl implements PgPropertyService {
 
     private final PgPropertyRepository pgPropertyRepository;
+    private final NotificationClient notificationClient;
+    private final RestTemplate restTemplate;
 
     @Override
     public PgProperty addPgProperty(PgProperty pgProperty) {
@@ -24,12 +31,12 @@ public class PgPropertyServiceImpl implements PgPropertyService {
 
     @Override
     public List<PgProperty> getAllPgProperties() {
-        return pgPropertyRepository.findAll();
+        return pgPropertyRepository.findByAvailableRoomsGreaterThan(0);
     }
 
     @Override
     public List<PgProperty> getPgPropertiesByCity(String city) {
-        return pgPropertyRepository.findByCity(city);
+        return pgPropertyRepository.findByCityAndAvailableRoomsGreaterThan(city, 0);
     }
 
     @Override
@@ -75,8 +82,36 @@ public class PgPropertyServiceImpl implements PgPropertyService {
         existing.setRating(pgProperty.getRating());
         existing.setVerified(pgProperty.getVerified());
         existing.setImages(pgProperty.getImages());
-        // Add any other fields as needed
-        return pgPropertyRepository.save(existing);
+        
+        PgProperty updated = pgPropertyRepository.save(existing);
+
+        // Notify all active tenants about the update
+        try {
+            String bookingUrl = "http://localhost:8084/api/bookings/pg/" + id;
+            var response = restTemplate.exchange(
+                bookingUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+            
+            List<Map<String, Object>> bookings = response.getBody();
+            if (bookings != null) {
+                bookings.stream()
+                    .filter(b -> !"CANCELLED".equalsIgnoreCase((String) b.get("status")))
+                    .map(b -> (Integer) b.get("userId"))
+                    .distinct()
+                    .forEach(userId -> {
+                        String msg = String.format("The property '%s' has updated its details. Please check the latest information.", updated.getName());
+                        notificationClient.sendNotification(userId, msg);
+                    });
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the update
+            System.err.println("Failed to notify tenants for PG update: " + e.getMessage());
+        }
+
+        return updated;
     }
 
 }

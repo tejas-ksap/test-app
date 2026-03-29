@@ -7,10 +7,10 @@ const AdminDashboard = () => {
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen text-slate-800 dark:text-slate-300 antialiased selection:bg-primary selection:text-white pb-12">
-      <main className="max-w-7xl mx-auto p-6 lg:p-8 space-y-8">
+      <main className="max-w-7xl mx-auto p-6 space-y-8">
         <div>
           <h2 className="text-3xl font-display font-bold text-slate-900 dark:text-white mb-2">
-            Welcome back, {user?.username || "Admin"}!
+            Welcome, {user?.username || "Admin"}!
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-lg">
             Here's what's happening with your properties today.

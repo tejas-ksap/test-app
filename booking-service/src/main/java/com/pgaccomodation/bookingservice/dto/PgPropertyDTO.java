@@ -4,10 +4,12 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class PgPropertyDTO {
     private Integer pgId;
+    private List<String> images;
     private Integer ownerId;
     private String name;
     private String address;
