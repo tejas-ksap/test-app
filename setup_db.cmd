@@ -1,7 +1,7 @@
 @echo off
 set DB_NAME=pg_accommodation
 set DB_USER=root
-set DB_PASS=4636
+set DB_PASS=160702
 
 echo Creating database %DB_NAME%...
 mysql -u %DB_USER% -p%DB_PASS% -e "CREATE DATABASE IF NOT EXISTS %DB_NAME%;"
