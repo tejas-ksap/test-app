@@ -1,6 +1,6 @@
 package com.pgaccomodation.authservice.enums;
 
-public enum UserType {
+public enum Role {
     ADMIN,
     OWNER,
     TENANT

@@ -1,7 +1,9 @@
 package com.pgaccomodation.authservice.controller;
 
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import com.pgaccomodation.authservice.dto.AuthRequest;
 import com.pgaccomodation.authservice.dto.AuthResponse;
@@ -19,9 +21,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.ok(Map.of("message", "Registration successful"));
     }
 
     @PostMapping("/login")

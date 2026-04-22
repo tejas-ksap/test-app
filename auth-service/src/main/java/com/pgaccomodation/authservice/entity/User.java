@@ -1,6 +1,6 @@
 package com.pgaccomodation.authservice.entity;
 
-import com.pgaccomodation.authservice.enums.UserType;
+import com.pgaccomodation.authservice.enums.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,7 +25,8 @@ public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer userId;
+	@Column(name = "user_id")
+	private Integer id;
 
 	@Column(nullable = false, unique = true, length = 50)
 	private String username;
@@ -36,17 +37,16 @@ public class User {
 	@Column(nullable = false, unique = true, length = 100)
 	private String email;
 
-	@Column(nullable = false, length = 15)
-	private String phone;
+	@Column(name = "phone", nullable = false, length = 15)
+	private String phoneNumber;
 
-	@Column(nullable = false)
+	@Column(name = "full_name", nullable = false)
 	private String fullName;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private UserType userType;
+	@Column(name = "user_type", nullable = false)
+	private Role role;
 
-	private String profilePic;
-
+	@Column(name = "is_active")
 	private boolean isActive = true;
 }

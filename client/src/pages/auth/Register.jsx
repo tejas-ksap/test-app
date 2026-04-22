@@ -8,17 +8,19 @@ const Register = () => {
 
   const [formData, setFormData] = useState({
     username: "",
-    password: "",
-    email: "",
     fullName: "",
-    phone: "",
-    userType: "",
+    password: "",
+    confirmPassword: "",
+    email: "",
+    phoneNumber: "",
+    role: "",
   });
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,8 +30,13 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.userType) {
+    if (!formData.role) {
       setError("Please select a role (Tenant or Owner)");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
 
@@ -38,14 +45,22 @@ const Register = () => {
       const res = await api.post("/api/auth/register", formData);
       toast.success("Registration successful! Redirecting to login...");
       setSuccess("Registration successful!");
-      console.log("Register response:", res.data);
       setError("");
-
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       console.error("Register error:", err);
       setSuccess("");
-      const message = err.response?.data?.message || err.response?.data || "Registration failed";
+      
+      const data = err.response?.data;
+      let message = "Registration failed";
+      
+      if (typeof data === "object") {
+        // Handle validation errors map
+        message = Object.values(data).join(", ");
+      } else if (typeof data === "string") {
+        message = data;
+      }
+      
       setError(message);
       toast.error(message);
     } finally {
@@ -88,32 +103,50 @@ const Register = () => {
           />
         </div>
 
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="username">
+            Username
+          </label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            required
+            value={formData.username}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+            placeholder="johndoe"
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="username">
-              Username
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="email">
+              Email address
             </label>
             <input
-              id="username"
-              name="username"
-              type="text"
+              id="email"
+              name="email"
+              type="email"
               required
-              value={formData.username}
+              value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
-              placeholder="johndoe"
+              placeholder="john@example.com"
             />
           </div>
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="phone">
-              Phone
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="phoneNumber">
+              Phone Number
             </label>
             <input
-              id="phone"
-              name="phone"
+              id="phoneNumber"
+              name="phoneNumber"
               type="tel"
               required
-              value={formData.phone}
+              pattern="[0-9]{10}"
+              title="Phone number must be exactly 10 digits"
+              value={formData.phoneNumber}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
               placeholder="1234567890"
@@ -121,59 +154,71 @@ const Register = () => {
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="email">
-            Email address
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
-            placeholder="john@example.com"
-          />
-        </div>
-
-        <div className="space-y-1.5 relative">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="password">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
-              placeholder="••••••••"
-            />
-            <button
-              type="button"
-              className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              <span className="material-icons-outlined text-xl">
-                {showPassword ? "visibility" : "visibility_off"}
-              </span>
-            </button>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <span className="material-icons-outlined text-xl">
+                  {showPassword ? "visibility" : "visibility_off"}
+                </span>
+              </button>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="confirmPassword">
+              Confirm
+            </label>
+            <div className="relative">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <span className="material-icons-outlined text-xl">
+                  {showConfirmPassword ? "visibility" : "visibility_off"}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="userType">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="role">
             Role
           </label>
           <div className="relative">
             <select
-              id="userType"
-              name="userType"
+              id="role"
+              name="role"
               required
-              value={formData.userType}
+              value={formData.role}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all appearance-none"
             >

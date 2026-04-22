@@ -9,8 +9,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pgaccomodation.authservice.exception.FieldValidationException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(FieldValidationException.class)
+    public ResponseEntity<Map<String, String>> handleFieldValidationException(FieldValidationException ex) {
+        return new ResponseEntity<>(ex.getErrors(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
@@ -35,8 +42,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<Map<String, String>> handleAuthenticationException(org.springframework.security.core.AuthenticationException ex) {
         Map<String, String> response = new HashMap<>();
-        response.put("message", "Username or Password wrong. Please try again.");
+        response.put("message", "Invalid username/email or password");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(org.springframework.web.bind.MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((org.springframework.validation.FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
