@@ -1,9 +1,13 @@
 package com.pgaccomodation.authservice.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class AuthRequest {
-	private String username;
-	private String password;
+    @NotBlank(message = "Username or Email is required")
+    private String identifier;
+
+    @NotBlank(message = "Password is required")
+    private String password;
 }

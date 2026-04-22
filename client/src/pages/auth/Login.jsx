@@ -9,7 +9,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ identifier: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -37,7 +37,7 @@ const Login = () => {
       login(token, userData);
       toast.success("Welcome, " + (userData.fullName || userData.username) + "!");
 
-      const role = userData.userType;
+      const role = userData.role || userData.userType;
       if (role === "ADMIN") navigate("/admin/dashboard");
       else if (role === "OWNER") navigate("/owner/dashboard");
       else if (role === "TENANT") navigate("/tenant/dashboard");
@@ -117,18 +117,18 @@ const Login = () => {
         )}
 
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="username">
-            Username
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="identifier">
+            Username or Email
           </label>
           <input
-            id="username"
-            name="username"
+            id="identifier"
+            name="identifier"
             type="text"
             required
-            value={formData.username}
+            value={formData.identifier}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
-            placeholder="johndoe"
+            placeholder="johndoe or john@example.com"
           />
         </div>
 
