@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { pgSchema } from "../../utils/validation";
 
 const RegisterPG = () => {
   const navigate = useNavigate();
@@ -10,87 +13,88 @@ const RegisterPG = () => {
   const isEditMode = !!id;
   const { user } = useAuth();
   
-  const [formData, setFormData] = useState({
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-    landmark: "",
-    latitude: "",
-    longitude: "",
-    description: "",
-    totalRooms: "",
-    availableRooms: "",
-    pricePerBed: "",
-    depositAmount: "",
-    foodIncluded: false,
-    acAvailable: false,
-    wifiAvailable: false,
-    laundryAvailable: false,
-    pgType: "",
-    rating: "",
-    verified: false,
-    ownerId: user?.userid || "",
-    images: [],
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(pgSchema),
+    mode: "all",
+    defaultValues: {
+      name: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+      landmark: "",
+      latitude: "",
+      longitude: "",
+      description: "",
+      totalRooms: "",
+      availableRooms: "",
+      pricePerBed: "",
+      depositAmount: "",
+      foodIncluded: false,
+      acAvailable: false,
+      wifiAvailable: false,
+      laundryAvailable: false,
+      pgType: "",
+      rating: "",
+      verified: false,
+      ownerId: user?.userid || "",
+      images: [],
+    },
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [isLoading, setIsLoading] = useState(isEditMode);
+  const [serverError, setServerError] = useState("");
 
-  React.useEffect(() => {
+  const watchedImages = watch("images");
+
+  useEffect(() => {
     if (isEditMode) {
       const fetchProperty = async () => {
         try {
           const res = await api.get(`/api/pg-properties/${id}`);
-          const pg = res.data;
-          setFormData({
-            name: pg.name || "",
-            address: pg.address || "",
-            city: pg.city || "",
-            state: pg.state || "",
-            pincode: pg.pincode || "",
-            landmark: pg.landmark || "",
-            latitude: pg.latitude || "",
-            longitude: pg.longitude || "",
-            description: pg.description || "",
-            totalRooms: pg.totalRooms || "",
-            availableRooms: pg.availableRooms || "",
-            pricePerBed: pg.pricePerBed || "",
-            depositAmount: pg.depositAmount || "",
-            foodIncluded: pg.foodIncluded || false,
-            acAvailable: pg.acAvailable || false,
-            wifiAvailable: pg.wifiAvailable || false,
-            laundryAvailable: pg.laundryAvailable || false,
-            pgType: pg.pgType || "",
-            rating: pg.rating || "",
-            verified: pg.verified || false,
-            ownerId: pg.ownerId || user?.userid || "",
-            images: pg.images || [],
+          reset({
+            name: res.data.name || "",
+            address: res.data.address || "",
+            city: res.data.city || "",
+            state: res.data.state || "",
+            pincode: res.data.pincode || "",
+            landmark: res.data.landmark || "",
+            latitude: res.data.latitude || "",
+            longitude: res.data.longitude || "",
+            description: res.data.description || "",
+            totalRooms: res.data.totalRooms || "",
+            availableRooms: res.data.availableRooms || "",
+            pricePerBed: res.data.pricePerBed || "",
+            depositAmount: res.data.depositAmount || "",
+            foodIncluded: !!res.data.foodIncluded,
+            acAvailable: !!res.data.acAvailable,
+            wifiAvailable: !!res.data.wifiAvailable,
+            laundryAvailable: !!res.data.laundryAvailable,
+            pgType: res.data.pgType || "",
+            rating: res.data.rating || "",
+            verified: !!res.data.verified,
+            ownerId: res.data.ownerId || user?.userid || "",
+            images: res.data.images || [],
           });
         } catch (err) {
           console.error("Failed to fetch property details", err);
-          setError("Failed to load PG property for editing.");
+          setServerError("Failed to load PG property for editing.");
         } finally {
           setIsLoading(false);
         }
       };
       fetchProperty();
     }
-  }, [id, isEditMode, user?.userid]);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const [uploadingImages, setUploadingImages] = useState(false);
+  }, [id, isEditMode, reset]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -98,18 +102,9 @@ const RegisterPG = () => {
     setSelectedFiles((prev) => [...prev, ...files]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setIsSubmitting(true);
-
-    if (formData.pricePerBed < 0 || formData.totalRooms < 0 || formData.availableRooms < 0 || formData.depositAmount < 0) {
-      setError("Number fields cannot be negative.");
-      setIsSubmitting(false);
-      return;
-    }
-
+  const onSubmit = async (data) => {
+    setServerError("");
+    
     try {
       setUploadingImages(true);
       const uploadedImageKeys = await Promise.all(
@@ -122,35 +117,33 @@ const RegisterPG = () => {
       );
 
       const payload = {
-        ...formData,
-        ownerId: formData.ownerId || user?.userid,
-        latitude: parseFloat(formData.latitude),
-        longitude: parseFloat(formData.longitude),
-        totalRooms: parseInt(formData.totalRooms),
-        availableRooms: parseInt(formData.availableRooms),
-        pricePerBed: parseFloat(formData.pricePerBed),
-        depositAmount: parseFloat(formData.depositAmount),
-        rating: parseFloat(formData.rating || 0),
-        images: [...(formData.images || []), ...uploadedImageKeys],
+        ...data,
+        ownerId: data.ownerId || user?.userid,
+        images: [...(data.images || []), ...uploadedImageKeys],
       };
 
       if (isEditMode) {
         await api.put(`/api/pg-properties/${id}`, payload);
         toast.success("PG Updated Successfully!");
-        setSuccess("PG Updated Successfully!");
       } else {
         await api.post("/api/pg-properties", payload);
         toast.success("PG Registered Successfully!");
-        setSuccess("PG Registered Successfully!");
       }
       setTimeout(() => navigate(user?.role === "ADMIN" ? "/admin/pgs" : "/owner/pg-list"), 1500);
     } catch (err) {
       console.error(err);
-      setError("Failed to register PG. Check all fields.");
+      setServerError(err.response?.data?.message || "Failed to save PG. Please check all fields.");
     } finally {
       setUploadingImages(false);
-      setIsSubmitting(false);
     }
+  };
+
+  const ErrorMsg = ({ name }) => {
+    return errors[name] ? (
+      <p className="text-red-500 text-[10px] mt-1 font-bold animate-in fade-in slide-in-from-top-1 ml-1">
+        {errors[name].message}
+      </p>
+    ) : null;
   };
 
   if (isLoading) {
@@ -165,25 +158,33 @@ const RegisterPG = () => {
     <div className="mx-auto py-8 animate-in fade-in duration-500">
       <div className="mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{isEditMode ? "Edit Property details" : "Register New Property"}</h1>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">{isEditMode ? "Tweak your listing information instantly." : "List your accommodation and start managing tenants seamlessly."}</p>
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            {isEditMode ? "Edit Property details" : "Register New Property"}
+          </h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            {isEditMode ? "Tweak your listing information instantly." : "List your accommodation and start managing tenants seamlessly."}
+          </p>
         </div>
 
-        {error && (
+        {serverError && (
           <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-xl flex items-center gap-3">
             <span className="material-icons-outlined text-red-500">error_outline</span>
-            <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
+            <p className="text-red-700 dark:text-red-400 font-medium">{serverError}</p>
           </div>
         )}
 
-        {success && (
-          <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded-xl flex items-center gap-3">
-            <span className="material-icons-outlined text-green-500">check_circle_outline</span>
-            <p className="text-green-700 dark:text-green-400 font-medium">{success}</p>
+        {Object.keys(errors).length > 0 && (
+          <div className="bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500 p-4 rounded-xl">
+            <p className="text-orange-700 dark:text-orange-400 font-bold mb-2">Please fix the following errors:</p>
+            <ul className="list-disc list-inside text-sm text-orange-600 dark:text-orange-300">
+              {Object.entries(errors).map(([key, err]) => (
+                <li key={key}>{key}: {err.message}</li>
+              ))}
+            </ul>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-12">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
 
           {/* Section: Basic Information */}
           <div className="bg-white dark:bg-gray-900 rounded-[2rem] p-8 shadow-sm border border-gray-100 dark:border-gray-800">
@@ -198,53 +199,53 @@ const RegisterPG = () => {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">PG Name</label>
                 <input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
+                  {...register("name")}
                   placeholder="e.g. Sunset Premium PG"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.name ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="name" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">PG Type</label>
                 <select
-                  name="pgType"
-                  value={formData.pgType}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none cursor-pointer outline-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236B7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C/polyline%3E%3C/svg%3E')] bg-[length:1.25rem] bg-[right_1.25rem_center] bg-no-repeat pr-12 hover:shadow-sm"
+                  {...register("pgType")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none cursor-pointer outline-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236B7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C/polyline%3E%3C/svg%3E')] bg-[length:1.25rem] bg-[right_1.25rem_center] bg-no-repeat pr-12 hover:shadow-sm ${
+                    errors.pgType ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 >
                   <option value="" disabled>Select Type</option>
                   <option value="MALE_ONLY">Boys PG</option>
                   <option value="FEMALE_ONLY">Girls PG</option>
                   <option value="UNISEX">Unisex PG</option>
                 </select>
+                <ErrorMsg name="pgType" />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Description</label>
                 <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
+                  {...register("description")}
                   placeholder="Tell potential tenants about your property..."
                   rows={4}
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none resize-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none resize-none ${
+                    errors.description ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="description" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Initial Rating (0-5)</label>
                 <input
                   type="number"
                   step="0.1"
-                  max="5"
-                  min="0"
-                  name="rating"
-                  value={formData.rating}
-                  onChange={handleChange}
+                  {...register("rating")}
                   placeholder="e.g. 4.5"
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.rating ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="rating" />
               </div>
             </div>
           </div>
@@ -262,83 +263,82 @@ const RegisterPG = () => {
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Full Address</label>
                 <input
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
+                  {...register("address")}
                   placeholder="Street, Area, Landmark"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.address ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="address" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">City</label>
                 <input
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
+                  {...register("city")}
                   placeholder="e.g. Noida"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.city ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="city" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">State</label>
                 <input
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
+                  {...register("state")}
                   placeholder="e.g. Uttar Pradesh"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.state ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="state" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Pincode</label>
                 <input
-                  type="number"
-                  name="pincode"
-                  value={formData.pincode}
-                  onChange={handleChange}
+                  type="text"
+                  {...register("pincode")}
                   placeholder="6-digit PIN"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.pincode ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="pincode" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Landmark</label>
                 <input
-                  name="landmark"
-                  value={formData.landmark}
-                  onChange={handleChange}
+                  {...register("landmark")}
                   placeholder="Near Meto/Mall"
                   className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
                 />
+                <ErrorMsg name="landmark" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Latitude</label>
                 <input
                   type="number"
                   step="any"
-                  name="latitude"
-                  value={formData.latitude}
-                  onChange={handleChange}
+                  {...register("latitude")}
                   placeholder="e.g. 28.5355"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.latitude ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="latitude" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Longitude</label>
                 <input
                   type="number"
                   step="any"
-                  name="longitude"
-                  value={formData.longitude}
-                  onChange={handleChange}
+                  {...register("longitude")}
                   placeholder="e.g. 77.3910"
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.longitude ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="longitude" />
               </div>
             </div>
           </div>
@@ -357,45 +357,45 @@ const RegisterPG = () => {
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Total Capacity (Beds/Vacancies)</label>
                 <input
                   type="number"
-                  name="totalRooms"
-                  value={formData.totalRooms}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  {...register("totalRooms")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.totalRooms ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="totalRooms" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Current Vacancy</label>
                 <input
                   type="number"
-                  name="availableRooms"
-                  value={formData.availableRooms}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  {...register("availableRooms")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.availableRooms ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="availableRooms" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Price per Bed (₹)</label>
                 <input
                   type="number"
-                  name="pricePerBed"
-                  value={formData.pricePerBed}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  {...register("pricePerBed")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.pricePerBed ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="pricePerBed" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Security Deposit (₹)</label>
                 <input
                   type="number"
-                  name="depositAmount"
-                  value={formData.depositAmount}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  {...register("depositAmount")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.depositAmount ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
+                <ErrorMsg name="depositAmount" />
               </div>
             </div>
           </div>
@@ -415,27 +415,28 @@ const RegisterPG = () => {
                 { name: "acAvailable", label: "AC Available", icon: "ac_unit" },
                 { name: "wifiAvailable", label: "Wi-Fi Available", icon: "wifi" },
                 { name: "laundryAvailable", label: "Laundry Available", icon: "local_laundry_service" },
-              ].map((item) => (
-                <label key={item.name} className={`flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer border-2 ${formData[item.name] ? 'bg-[#5A45FF]/5 border-[#5A45FF]/20' : 'bg-gray-50 dark:bg-gray-800/50 border-transparent hover:border-gray-200 dark:hover:border-gray-700'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className={`material-icons-outlined ${formData[item.name] ? 'text-[#5A45FF]' : 'text-gray-400'}`}>{item.icon}</span>
-                    <span className="font-semibold text-gray-700 dark:text-gray-300">{item.label}</span>
-                  </div>
-                  <div className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" name={item.name} checked={formData[item.name]} onChange={handleChange} className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#5A45FF]"></div>
-                  </div>
-                </label>
-              ))}
+              ].map((item) => {
+                const isChecked = watch(item.name);
+                return (
+                  <label key={item.name} className={`flex items-center justify-between p-4 rounded-2xl transition-all cursor-pointer border-2 ${isChecked ? 'bg-[#5A45FF]/5 border-[#5A45FF]/20' : 'bg-gray-50 dark:bg-gray-800/50 border-transparent hover:border-gray-200 dark:hover:border-gray-700'}`}>
+                    <div className="flex items-center gap-3">
+                      <span className={`material-icons-outlined ${isChecked ? 'text-[#5A45FF]' : 'text-gray-400'}`}>{item.icon}</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">{item.label}</span>
+                    </div>
+                    <div className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" {...register(item.name)} className="sr-only peer" />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#5A45FF]"></div>
+                    </div>
+                  </label>
+                );
+              })}
 
               <div className="sm:col-span-2 pt-4">
                 <label className="flex items-center gap-4 p-5 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-2xl cursor-pointer hover:shadow-sm transition-shadow">
                   <input
                     type="checkbox"
-                    name="verified"
-                    checked={formData.verified}
-                    onChange={handleChange}
-                    className="w-6 h-6 rounded-lg accent-yellow-500"
+                    {...register("verified")}
+                    className="w-6 h-6 rounded-lg accent-yellow-500 cursor-pointer"
                   />
                   <div>
                     <p className="font-bold text-yellow-800 dark:text-yellow-400">Mark as Verified Listing</p>
@@ -465,7 +466,7 @@ const RegisterPG = () => {
                   disabled={uploadingImages}
                   className="absolute inset-0 opacity-0 cursor-pointer z-10"
                 />
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                <div className="bg-white dark:bg-800 p-4 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform">
                   {uploadingImages ? (
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5A45FF]"></div>
                   ) : (
@@ -477,15 +478,18 @@ const RegisterPG = () => {
               </div>
 
               {/* Render Pre-existing Server Images */}
-              {formData.images && formData.images.length > 0 && (
+              {watchedImages && watchedImages.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                  {formData.images.map((img, idx) => (
+                  {watchedImages.map((img, idx) => (
                     <div key={`existing-${idx}`} className="aspect-square rounded-xl overflow-hidden shadow-sm relative group border-2 border-[#5A45FF]/30">
                       <img src={img.startsWith('http') ? img : `${api.defaults.baseURL}/api/users/images/${img}`} alt={`Preview existing ${idx}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <span 
                           className="material-icons text-white cursor-pointer hover:text-red-400 drop-shadow-md"
-                          onClick={() => setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }))}
+                          onClick={() => {
+                            const newImages = watchedImages.filter((_, i) => i !== idx);
+                            setValue("images", newImages);
+                          }}
                         >delete</span>
                       </div>
                     </div>
@@ -495,7 +499,7 @@ const RegisterPG = () => {
 
               {selectedFiles.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                  {selectedFiles.slice(0, 6).map((file, idx) => (
+                  {selectedFiles.slice(0, 10).map((file, idx) => (
                     <div key={idx} className="aspect-square rounded-xl overflow-hidden shadow-sm relative group">
                       <img src={URL.createObjectURL(file)} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -506,9 +510,9 @@ const RegisterPG = () => {
                       </div>
                     </div>
                   ))}
-                  {selectedFiles.length > 6 && (
+                  {selectedFiles.length > 10 && (
                     <div className="aspect-square rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 font-bold border-2 border-dashed border-gray-200">
-                      +{selectedFiles.length - 6} more
+                      +{selectedFiles.length - 10} more
                     </div>
                   )}
                 </div>
