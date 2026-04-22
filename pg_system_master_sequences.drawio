@@ -1,0 +1,122 @@
+<mxfile host="Electron" modified="2024-04-12T16:00:00.000Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="PgFullMasterJourneys" version="21.6.8" type="device">
+  
+  <!-- PAGE 1: THE TENANT JOURNEY -->
+  <diagram id="TenantJourney" name="The Tenant Journey">
+    <mxGraphModel dx="2000" dy="2000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="2200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t_title" value="Tenant Journey: Onboarding &amp; Booking Orchestration" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1500" height="50" as="geometry" />
+        </mxCell>
+        <!-- LIFELINES -->
+        <mxCell id="T_tenant" value="Tenant" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1"><mxGeometry x="100" y="100" width="30" height="60" as="geometry" /></mxCell>
+        <mxCell id="T_tenant_line" value="" style="endArrow=none;dashed=1;html=1;" edge="1" parent="1" target="T_tenant"><mxGeometry relative="1" as="geometry"><mxPoint x="115" y="2000" as="sourcePoint" /><mxPoint x="115" y="160" as="targetPoint" /></mxGeometry></mxCell>
+        <mxCell id="T_tenant_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#eeeeee;" vertex="1" parent="1"><mxGeometry x="110" y="180" width="10" height="1700" as="geometry" /></mxCell>
+
+        <mxCell id="T_gateway" value="ApiGateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fillColor=#f5f5f5;" vertex="1" parent="1"><mxGeometry x="250" y="100" width="120" height="1900" as="geometry" /></mxCell>
+        <mxCell id="T_gateway_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#f5f5f5;" vertex="1" parent="T_gateway"><mxGeometry x="55" y="80" width="10" height="1600" as="geometry" /></mxCell>
+
+        <mxCell id="T_auth" value="AuthService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fillColor=#dae8fc;" vertex="1" parent="1"><mxGeometry x="450" y="100" width="120" height="1900" as="geometry" /></mxCell>
+        <mxCell id="T_auth_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#dae8fc;" vertex="1" parent="T_auth"><mxGeometry x="55" y="100" width="10" height="200" as="geometry" /></mxCell>
+
+        <mxCell id="T_prop" value="PropertyService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fillColor=#fff2cc;" vertex="1" parent="1"><mxGeometry x="650" y="100" width="120" height="1900" as="geometry" /></mxCell>
+        <mxCell id="T_prop_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#fff2cc;" vertex="1" parent="T_prop"><mxGeometry x="55" y="400" width="10" height="400" as="geometry" /></mxCell>
+
+        <mxCell id="T_book" value="BookingService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fillColor=#f8cecc;" vertex="1" parent="1"><mxGeometry x="850" y="100" width="120" height="1900" as="geometry" /></mxCell>
+        <mxCell id="T_book_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#f8cecc;" vertex="1" parent="T_book"><mxGeometry x="55" y="900" width="10" height="600" as="geometry" /></mxCell>
+
+        <mxCell id="T_db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;fillColor=#eeeeee;" vertex="1" parent="1"><mxGeometry x="1100" y="100" width="120" height="1900" as="geometry" /></mxCell>
+        <mxCell id="T_db_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="T_db"><mxGeometry x="55" y="120" width="10" height="1500" as="geometry" /></mxCell>
+
+        <!-- MESSAGES -->
+        <mxCell id="TM1" value="1. login(AuthRequest)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_tenant_act" target="T_gateway_act"><mxGeometry relative="1" as="geometry"><mxPoint y="180" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="TM2" value="2. forward request" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" parent="1" source="T_gateway_act" target="T_auth_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="TM3" value="3. findByUsername()" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_auth_act" target="T_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="TM4" value="4. Return JWT" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;" edge="1" parent="1" source="T_auth_act" target="T_tenant_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="TM5" value="5. search(city)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_tenant_act" target="T_prop_act"><mxGeometry relative="1" as="geometry"><mxPoint y="450" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="TM6" value="6. SELECT where city=?" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_prop_act" target="T_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="TM7" value="7. addReview(pgId, userId, rating)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_tenant_act" target="T_prop_act"><mxGeometry relative="1" as="geometry"><mxPoint y="600" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="TM8" value="8. updatePropertyRating()" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_prop_act" target="T_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="TM9" value="9. createBooking(Booking)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_tenant_act" target="T_book_act"><mxGeometry relative="1" as="geometry"><mxPoint y="950" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="TM10" value="10. [REST] checkAvailability(pgId)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_book_act" target="T_prop_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="TM11" value="11. decrementVacancy()" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_book_act" target="T_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="TM12" value="12. save(Booking)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="T_book_act" target="T_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="TM13" value="13. [ASYNCHRONOUS] sendNotification()" style="html=1;verticalAlign=bottom;endArrow=open;endSize=8;" edge="1" parent="1" source="T_book_act" target="T_db_act"><mxGeometry relative="1" as="geometry"><mxPoint x="1155" y="1400" as="targetPoint" /></mxGeometry></mxCell>
+
+        <mxCell id="TM14" value="14. Booking CONFIRMED" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="T_book_act" target="T_tenant_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- PAGE 2: THE OWNER LIFECYCLE -->
+  <diagram id="OwnerLifecycle" name="The Owner Lifecycle">
+    <mxGraphModel dx="2000" dy="2000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="o_title" value="Owner Lifecycle: PG Onboarding &amp; Management Oversight" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1500" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="O_owner" value="Owner" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1"><mxGeometry x="100" y="100" width="30" height="60" as="geometry" /></mxCell>
+        <mxCell id="O_owner_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#eeeeee;" vertex="1" parent="1"><mxGeometry x="110" y="180" width="10" height="1300" as="geometry" /></mxCell>
+
+        <mxCell id="O_gateway" value="ApiGateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="250" y="100" width="120" height="1500" as="geometry" /></mxCell>
+        <mxCell id="O_prop" value="PropertyService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="450" y="100" width="120" height="1500" as="geometry" /></mxCell>
+        <mxCell id="O_prop_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="O_prop"><mxGeometry x="55" y="100" width="10" height="800" as="geometry" /></mxCell>
+        
+        <mxCell id="O_user" value="UserService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="650" y="100" width="120" height="1500" as="geometry" /></mxCell>
+        <mxCell id="O_user_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="O_user"><mxGeometry x="55" y="1000" width="10" height="300" as="geometry" /></mxCell>
+
+        <mxCell id="O_db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="900" y="100" width="120" height="1500" as="geometry" /></mxCell>
+        <mxCell id="O_db_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="O_db"><mxGeometry x="55" y="120" width="10" height="1200" as="geometry" /></mxCell>
+
+        <!-- MESSAGES -->
+        <mxCell id="OM1" value="1. addPgProperty(PgProperty)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="O_owner_act" target="O_prop_act"><mxGeometry relative="1" as="geometry"><mxPoint y="150" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="OM2" value="2. save(PgProperty)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="O_prop_act" target="O_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="OM3" value="3. addRoom(roomId)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="O_owner_act" target="O_prop_act"><mxGeometry relative="1" as="geometry"><mxPoint y="350" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="OM4" value="4. save(Room)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="O_prop_act" target="O_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        
+        <mxCell id="OM5" value="5. [NOTIFY] Tenant booked property" style="html=1;verticalAlign=bottom;endArrow=block;dashed=1;strokeColor=#FF0000;" edge="1" parent="1" source="O_db_act" target="O_user_act"><mxGeometry relative="1" as="geometry"><mxPoint x="955" y="1050" as="sourcePoint" /></mxGeometry></mxCell>
+        <mxCell id="OM6" value="6. notifyOwner(ownerId, msg)" style="html=1;verticalAlign=bottom;endArrow=open;endSize=8;" edge="1" parent="1" source="O_user_act" target="O_owner_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- PAGE 3: THE ADMIN OVERSIGHT PATH -->
+  <diagram id="AdminOversight" name="The Admin Oversight Path">
+    <mxGraphModel dx="2000" dy="2000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="a_title" value="Admin Oversight: System Governance &amp; Content Moderation" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1500" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="A_admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1"><mxGeometry x="100" y="100" width="30" height="60" as="geometry" /></mxCell>
+        <mxCell id="A_admin_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="1"><mxGeometry x="110" y="180" width="10" height="1000" as="geometry" /></mxCell>
+
+        <mxCell id="A_gateway" value="ApiGateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="250" y="100" width="120" height="1200" as="geometry" /></mxCell>
+        <mxCell id="A_user" value="UserService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="450" y="100" width="120" height="1200" as="geometry" /></mxCell>
+        <mxCell id="A_user_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="A_user"><mxGeometry x="55" y="120" width="10" height="300" as="geometry" /></mxCell>
+
+        <mxCell id="A_prop" value="PropertyService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="650" y="100" width="120" height="1200" as="geometry" /></mxCell>
+        <mxCell id="A_prop_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="A_prop"><mxGeometry x="55" y="500" width="10" height="300" as="geometry" /></mxCell>
+
+        <mxCell id="A_db" value="Database" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="900" y="100" width="120" height="1200" as="geometry" /></mxCell>
+        <mxCell id="A_db_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;" vertex="1" parent="A_db"><mxGeometry x="55" y="140" width="10" height="900" as="geometry" /></mxCell>
+
+        <!-- MESSAGES -->
+        <mxCell id="AM1" value="1. getAllUsers()" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="A_admin_act" target="A_user_act"><mxGeometry relative="1" as="geometry"><mxPoint y="150" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="AM2" value="2. SELECT * FROM users" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="A_user_act" target="A_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="AM3" value="3. deactivateUser(userId)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="A_admin_act" target="A_user_act"><mxGeometry relative="1" as="geometry"><mxPoint y="350" as="offset" /></mxGeometry></mxCell>
+
+        <mxCell id="AM4" value="4. getAllProperties()" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="A_admin_act" target="A_prop_act"><mxGeometry relative="1" as="geometry"><mxPoint y="550" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="AM5" value="5. deleteProperty(pgId)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="A_admin_act" target="A_prop_act"><mxGeometry relative="1" as="geometry"><mxPoint y="700" as="offset" /></mxGeometry></mxCell>
+        <mxCell id="AM6" value="6. DELETE FROM pg_properties" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="A_prop_act" target="A_db_act"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

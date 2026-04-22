@@ -1,0 +1,175 @@
+<mxfile host="Electron" modified="2024-04-12T15:30:00.000Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="PgFullSequenceDiagram" version="21.6.8" type="device">
+  <diagram id="PgFullSequence" name="PG End-to-End Sequence Diagram">
+    <mxGraphModel dx="2000" dy="2000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="title" value="PG Accommodation System — End-to-End Booking Sequence" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1500" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- LIFELINES -->
+        <!-- Actor: Tenant -->
+        <mxCell id="L_tenant" value="Tenant (Actor)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="L_tenant_line" value="" style="endArrow=none;dashed=1;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="L_tenant_act" target="L_tenant">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="160" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L_tenant_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#eeeeee;" vertex="1" parent="1">
+          <mxGeometry x="110" y="180" width="10" height="1200" as="geometry" />
+        </mxCell>
+
+        <!-- ApiGateway -->
+        <mxCell id="L_gateway" value="ApiGateway" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f5f5f5;" vertex="1" parent="1">
+          <mxGeometry x="250" y="100" width="120" height="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="L_gateway_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#f5f5f5;" vertex="1" parent="L_gateway">
+          <mxGeometry x="55" y="80" width="10" height="1100" as="geometry" />
+        </mxCell>
+
+        <!-- AuthService -->
+        <mxCell id="L_auth" value="AuthService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="450" y="100" width="120" height="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="L_auth_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#dae8fc;" vertex="1" parent="L_auth">
+          <mxGeometry x="55" y="100" width="10" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- PropertyService -->
+        <mxCell id="L_property" value="PropertyService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="650" y="100" width="120" height="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="L_property_act" value="" style="html=1;points=[]; perimeter=orthogonalPerimeter;fillColor=#fff2cc;" vertex="1" parent="L_property">
+          <mxGeometry x="55" y="300" width="10" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- BookingService -->
+        <mxCell id="L_booking" value="BookingService" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="850" y="100" width="120" height="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="L_booking_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#f8cecc;" vertex="1" parent="L_booking">
+          <mxGeometry x="55" y="550" width="10" height="500" as="geometry" />
+        </mxCell>
+
+        <!-- UserService (Owner) -->
+        <mxCell id="L_user" value="UserService (Owner)" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="100" width="140" height="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="L_user_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#d5e8d4;" vertex="1" parent="L_user">
+          <mxGeometry x="65" y="900" width="10" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Database -->
+        <mxCell id="L_db" value="Database (SQL)" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;container=1;collapsible=0;recursiveResize=0;outlineConnect=0;fillColor=#eeeeee;strokeColor=#36393d;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="100" width="120" height="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="L_db_act" value="" style="html=1;points=[];perimeter=orthogonalPerimeter;fillColor=#eeeeee;" vertex="1" parent="L_db">
+          <mxGeometry x="55" y="120" width="10" height="1000" as="geometry" />
+        </mxCell>
+
+        <!-- MESSAGES -->
+        <!-- Step 1: Login -->
+        <mxCell id="M1" value="1. login(AuthRequest)" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" parent="1" source="L_tenant_act" target="L_gateway_act">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="180" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="M2" value="2. route &amp; validate" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" parent="1" source="L_gateway_act" target="L_auth_act">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="315" y="200" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="M3" value="3. findByUsername()" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0.04;" edge="1" parent="1" source="L_auth_act" target="L_db_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="M4" value="4. Return JWT" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=1;" edge="1" parent="1" source="L_auth_act" target="L_tenant_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2: Search -->
+        <mxCell id="M5" value="5. GET /properties?city=..." style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_tenant_act" target="L_gateway_act">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="400" as="sourcePoint" />
+            <mxPoint x="305" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="M6" value="6. fetchProperties()" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_gateway_act" target="L_property_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="M7" value="7. SELECT where availability &gt; 0" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_property_act" target="L_db_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="M8" value="8. List&lt;PgProperty&gt;" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=1;" edge="1" parent="1" source="L_property_act" target="L_tenant_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3: Booking (Critical Path) -->
+        <mxCell id="M9" value="9. createBooking(Booking)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_tenant_act" target="L_gateway_act">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="115" y="650" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="M10" value="10. validate &amp; forward" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" parent="1" source="L_gateway_act" target="L_booking_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- FRAGMENT: ALT - Vacancy Check -->
+        <mxCell id="F_alt_vacancy" value="alt [Vacancy Available]" style="shape=umlFrame;whiteSpace=wrap;html=1;width=120;height=30;boundedLbl=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="1400" height="500" as="geometry" />
+        </mxCell>
+
+        <mxCell id="M11" value="11. findById(pgId)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_booking_act" target="L_db_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="M12" value="12. Decrement Vacancy &amp; Save" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_booking_act" target="L_db_act">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="915" y="800" as="sourcePoint" />
+            <mxPoint x="1355" y="800" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="M13" value="13. save(Booking)" style="html=1;verticalAlign=bottom;endArrow=block;" edge="1" parent="1" source="L_booking_act" target="L_db_act">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="915" y="850" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- notify owner -->
+        <mxCell id="M14" value="14. sendNotification(OwnerId, msg)" style="html=1;verticalAlign=bottom;endArrow=block;entryX=0;entryY=0;" edge="1" parent="1" source="L_booking_act" target="L_user_act">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="M15" value="15. Push Notification (Owner)" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="L_user_act" target="L_db_act">
+          <mxGeometry relative="1" as="geometry">
+             <mxPoint x="1355" y="1050" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="M16" value="16. Booking SUCCESS" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;exitX=0;exitY=0.9;" edge="1" parent="1" source="L_booking_act" target="L_tenant_act">
+          <mxGeometry relative="1" as="geometry">
+             <mxPoint x="115" y="1100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ALT Else -->
+        <mxCell id="alt_sep" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=#000000;dashed=1;" vertex="1" parent="F_alt_vacancy">
+          <mxGeometry y="420" width="1400" height="10" as="geometry" />
+        </mxCell>
+        <mxCell id="alt_text" value="[Insufficient Vacancy]" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="F_alt_vacancy">
+          <mxGeometry x="10" y="430" width="130" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="M17" value="17. Error: 400 No Vacancies" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;fontColor=#FF0000;" edge="1" parent="1" source="L_booking_act">
+          <mxGeometry relative="1" as="geometry">
+             <mxPoint x="115" y="1180" as="targetPoint" />
+             <mxPoint x="905" y="1180" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
