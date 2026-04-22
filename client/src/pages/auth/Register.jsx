@@ -2,83 +2,88 @@ import React, { useState } from "react";
 import api from "../../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "../../utils/validation";
 
 const Register = () => {
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    username: "",
-    fullName: "",
-    password: "",
-    confirmPassword: "",
-    email: "",
-    phoneNumber: "",
-    role: "",
-  });
-
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError("");
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    mode: "all",
+    defaultValues: {
+      username: "",
+      fullName: "",
+      password: "",
+      confirmPassword: "",
+      email: "",
+      phoneNumber: "",
+      role: "",
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.role) {
-      setError("Please select a role (Tenant or Owner)");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
+  const onSubmit = async (data) => {
     setLoading(true);
+    setServerError("");
+    setSuccess("");
+    
     try {
-      const res = await api.post("/api/auth/register", formData);
+      const res = await api.post("/api/auth/register", data);
+      
       toast.success("Registration successful! Redirecting to login...");
       setSuccess("Registration successful!");
-      setError("");
+      reset();
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       console.error("Register error:", err);
-      setSuccess("");
       
       const data = err.response?.data;
       let message = "Registration failed";
       
-      if (typeof data === "object") {
-        // Handle validation errors map
+      if (typeof data === "object" && data !== null) {
+        // Handle validation errors map from backend if any
         message = Object.values(data).join(", ");
       } else if (typeof data === "string") {
         message = data;
       }
       
-      setError(message);
+      setServerError(message);
       toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
+  const ErrorMsg = ({ name }) => {
+    return errors[name] ? (
+      <p className="text-red-500 text-xs mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+        {errors[name].message}
+      </p>
+    ) : null;
+  };
+
   return (
     <>
       <div className="mb-8 mt-2">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 font-display">Create an Account</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 font-display tracking-tight">Create an Account</h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm">Join PG Accommodations to find or list your PG.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm border border-red-100 dark:border-red-800">
-            {error}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {serverError && (
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm border border-red-100 dark:border-red-800 animate-in shake duration-300">
+            {serverError}
           </div>
         )}
         {success && (
@@ -93,14 +98,14 @@ const Register = () => {
           </label>
           <input
             id="fullName"
-            name="fullName"
             type="text"
-            required
-            value={formData.fullName}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+            {...register("fullName")}
+            className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all ${
+              errors.fullName ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+            }`}
             placeholder="John Doe"
           />
+          <ErrorMsg name="fullName" />
         </div>
 
         <div className="space-y-1.5">
@@ -109,31 +114,31 @@ const Register = () => {
           </label>
           <input
             id="username"
-            name="username"
             type="text"
-            required
-            value={formData.username}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+            {...register("username")}
+            className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all ${
+              errors.username ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+            }`}
             placeholder="johndoe"
           />
+          <ErrorMsg name="username" />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="email">
               Email address
             </label>
             <input
               id="email"
-              name="email"
               type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+              {...register("email")}
+              className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all ${
+                errors.email ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+              }`}
               placeholder="john@example.com"
             />
+            <ErrorMsg name="email" />
           </div>
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="phoneNumber">
@@ -141,20 +146,18 @@ const Register = () => {
             </label>
             <input
               id="phoneNumber"
-              name="phoneNumber"
               type="tel"
-              required
-              pattern="[0-9]{10}"
-              title="Phone number must be exactly 10 digits"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+              {...register("phoneNumber")}
+              className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all ${
+                errors.phoneNumber ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+              }`}
               placeholder="1234567890"
             />
+            <ErrorMsg name="phoneNumber" />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="password">
               Password
@@ -162,12 +165,11 @@ const Register = () => {
             <div className="relative">
               <input
                 id="password"
-                name="password"
                 type={showPassword ? "text" : "password"}
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
+                {...register("password")}
+                className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12 ${
+                  errors.password ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+                }`}
                 placeholder="••••••••"
               />
               <button
@@ -180,6 +182,7 @@ const Register = () => {
                 </span>
               </button>
             </div>
+            <ErrorMsg name="password" />
           </div>
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="confirmPassword">
@@ -190,10 +193,10 @@ const Register = () => {
                 id="confirmPassword"
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
+                {...register("confirmPassword", { required: "Confirm password is required" })}
+                className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12 ${
+                  errors.confirmPassword ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+                }`}
                 placeholder="••••••••"
               />
               <button
@@ -206,6 +209,7 @@ const Register = () => {
                 </span>
               </button>
             </div>
+            <ErrorMsg name="confirmPassword" />
           </div>
         </div>
 
@@ -216,11 +220,10 @@ const Register = () => {
           <div className="relative">
             <select
               id="role"
-              name="role"
-              required
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all appearance-none"
+              {...register("role")}
+              className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all appearance-none ${
+                errors.role ? "border-red-500 focus:border-red-500 focus:ring-red-500/30" : "border-gray-200 dark:border-gray-600"
+              }`}
             >
               <option value="" disabled>-- Select a Role --</option>
               <option value="TENANT">Tenant (Looking for PG)</option>
@@ -230,22 +233,31 @@ const Register = () => {
               <span className="material-icons-outlined text-xl">expand_more</span>
             </div>
           </div>
+          <ErrorMsg name="role" />
         </div>
 
-        <div className="pt-2">
+        <div className="pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-3.5 px-4 rounded-xl text-white bg-[#5A45FF] hover:bg-[#4633e6] active:bg-[#3b2bc7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5A45FF] font-medium transition-all shadow-md disabled:opacity-70"
+            className="w-full flex justify-center py-3.5 px-4 rounded-xl text-white bg-[#5A45FF] hover:bg-[#4633e6] active:bg-[#3b2bc7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5A45FF] font-semibold transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-[0.98]"
           >
-            {loading ? "Registering..." : "Create Account"}
+            {loading ? (
+              <div className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating Account...
+              </div>
+            ) : "Create Account"}
           </button>
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-6">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-[#5A45FF] hover:text-[#4633e6] transition-colors">
+            <Link to="/login" className="font-bold text-[#5A45FF] hover:text-[#4633e6] transition-colors underline decoration-[#5A45FF]/20 underline-offset-4 hover:decoration-[#5A45FF]">
               Sign in
             </Link>
           </p>
