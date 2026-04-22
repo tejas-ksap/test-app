@@ -173,17 +173,6 @@ const RegisterPG = () => {
           </div>
         )}
 
-        {Object.keys(errors).length > 0 && (
-          <div className="bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500 p-4 rounded-xl">
-            <p className="text-orange-700 dark:text-orange-400 font-bold mb-2">Please fix the following errors:</p>
-            <ul className="list-disc list-inside text-sm text-orange-600 dark:text-orange-300">
-              {Object.entries(errors).map(([key, err]) => (
-                <li key={key}>{key}: {err.message}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
 
           {/* Section: Basic Information */}

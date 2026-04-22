@@ -4,27 +4,36 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "../../utils/validation";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [formData, setFormData] = useState({ identifier: "", password: "" });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+    defaultValues: {
+      identifier: "",
+      password: "",
+    },
+  });
+
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setError("");
-    setLoading(true);
 
     try {
-      const res = await api.post("/api/auth/login", formData);
+      const res = await api.post("/api/auth/login", data);
       const token = res.data.token;
 
       const userRes = await api.get("/api/users/me", {
@@ -47,8 +56,6 @@ const Login = () => {
       const message = err.response?.data?.message || err.response?.data || "Login failed. Please check your credentials.";
       setError(message);
       toast.error(message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -109,7 +116,7 @@ const Login = () => {
         <p className="text-gray-500 dark:text-gray-400 text-sm">Please enter your details to sign in.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {error && (
           <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm border border-red-100 dark:border-red-800">
             {error}
@@ -122,14 +129,16 @@ const Login = () => {
           </label>
           <input
             id="identifier"
-            name="identifier"
             type="text"
-            required
-            value={formData.identifier}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all"
+            {...register("identifier")}
+            className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all ${
+              errors.identifier ? "border-red-500" : "border-gray-200 dark:border-gray-600"
+            }`}
             placeholder="johndoe or john@example.com"
           />
+          {errors.identifier && (
+            <p className="text-red-500 text-xs mt-1">{errors.identifier.message}</p>
+          )}
         </div>
 
         <div className="space-y-1.5 relative">
@@ -139,12 +148,11 @@ const Login = () => {
           <div className="relative">
             <input
               id="password"
-              name="password"
               type={showPassword ? "text" : "password"}
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12"
+              {...register("password")}
+              className={`w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#5A45FF]/30 focus:border-[#5A45FF] transition-all pr-12 ${
+                errors.password ? "border-red-500" : "border-gray-200 dark:border-gray-600"
+              }`}
               placeholder="••••••••"
             />
             <button
@@ -157,6 +165,9 @@ const Login = () => {
               </span>
             </button>
           </div>
+          {errors.password && (
+            <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
+          )}
         </div>
 
         <div className="flex items-center justify-between pt-1">
@@ -164,7 +175,6 @@ const Login = () => {
             <div className="relative flex items-center justify-center w-5 h-5">
               <input
                 id="remember-me"
-                name="remember-me"
                 type="checkbox"
                 className="peer appearance-none w-5 h-5 border border-gray-300 dark:border-gray-600 rounded-full bg-white dark:bg-gray-800 checked:bg-[#5A45FF] checked:border-transparent focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#5A45FF]/50 transition-all cursor-pointer"
               />
@@ -185,10 +195,10 @@ const Login = () => {
         <div className="pt-2">
           <button
             type="submit"
-            disabled={loading}
+            disabled={isSubmitting}
             className="w-full flex justify-center py-3.5 px-4 rounded-xl text-white bg-[#5A45FF] hover:bg-[#4633e6] active:bg-[#3b2bc7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5A45FF] font-medium transition-all shadow-md disabled:opacity-70"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </div>
 
