@@ -3,6 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+<<<<<<< Updated upstream
+=======
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { pgRegistrationSchema } from "../../utils/validation";
+>>>>>>> Stashed changes
 
 const RegisterPG = () => {
   const navigate = useNavigate();
@@ -10,6 +16,7 @@ const RegisterPG = () => {
   const isEditMode = !!id;
   const { user } = useAuth();
   
+<<<<<<< Updated upstream
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -33,6 +40,43 @@ const RegisterPG = () => {
     verified: false,
     ownerId: user?.userid || "",
     images: [],
+=======
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(pgRegistrationSchema),
+    mode: "all",
+    defaultValues: {
+      pgName: "",
+      fullAddress: "",
+      city: "",
+      state: "",
+      pincode: "",
+      landmark: "",
+      latitude: "",
+      longitude: "",
+      description: "",
+      totalCapacity: "",
+      currentVacancy: "",
+      pricePerBed: "",
+      securityDeposit: "",
+      foodIncluded: false,
+      acAvailable: false,
+      wifiAvailable: false,
+      laundryAvailable: false,
+      pgType: "",
+      rating: "",
+      verified: false,
+      ownerId: user?.userid || "",
+      images: [],
+    },
+>>>>>>> Stashed changes
   });
 
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -41,11 +85,19 @@ const RegisterPG = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(isEditMode);
 
+<<<<<<< Updated upstream
   React.useEffect(() => {
+=======
+
+  const watchedImages = watch("images");
+
+  useEffect(() => {
+>>>>>>> Stashed changes
     if (isEditMode) {
       const fetchProperty = async () => {
         try {
           const res = await api.get(`/api/pg-properties/${id}`);
+<<<<<<< Updated upstream
           const pg = res.data;
           setFormData({
             name: pg.name || "",
@@ -70,6 +122,31 @@ const RegisterPG = () => {
             verified: pg.verified || false,
             ownerId: pg.ownerId || user?.userid || "",
             images: pg.images || [],
+=======
+          reset({
+            pgName: res.data.pgName || res.data.name || "",
+            fullAddress: res.data.address || "",
+            city: res.data.city || "",
+            state: res.data.state || "",
+            pincode: res.data.pincode || "",
+            landmark: res.data.landmark || "",
+            latitude: res.data.latitude || "",
+            longitude: res.data.longitude || "",
+            description: res.data.description || "",
+            totalCapacity: res.data.totalRooms || "",
+            currentVacancy: res.data.availableRooms || "",
+            pricePerBed: res.data.pricePerBed || "",
+            securityDeposit: res.data.depositAmount || "",
+            foodIncluded: !!res.data.foodIncluded,
+            acAvailable: !!res.data.acAvailable,
+            wifiAvailable: !!res.data.wifiAvailable,
+            laundryAvailable: !!res.data.laundryAvailable,
+            pgType: res.data.pgType || "",
+            rating: res.data.rating || "",
+            verified: !!res.data.verified,
+            ownerId: res.data.ownerId || user?.userid || "",
+            images: res.data.images || [],
+>>>>>>> Stashed changes
           });
         } catch (err) {
           console.error("Failed to fetch property details", err);
@@ -80,6 +157,7 @@ const RegisterPG = () => {
       };
       fetchProperty();
     }
+<<<<<<< Updated upstream
   }, [id, isEditMode, user?.userid]);
 
   const handleChange = (e) => {
@@ -91,6 +169,9 @@ const RegisterPG = () => {
   };
 
   const [uploadingImages, setUploadingImages] = useState(false);
+=======
+  }, [id, isEditMode, reset, user?.userid]);
+>>>>>>> Stashed changes
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -122,6 +203,7 @@ const RegisterPG = () => {
       );
 
       const payload = {
+<<<<<<< Updated upstream
         ...formData,
         ownerId: formData.ownerId || user?.userid,
         latitude: parseFloat(formData.latitude),
@@ -132,6 +214,16 @@ const RegisterPG = () => {
         depositAmount: parseFloat(formData.depositAmount),
         rating: parseFloat(formData.rating || 0),
         images: [...(formData.images || []), ...uploadedImageKeys],
+=======
+        ...data,
+        // Map new frontend names to backend names
+        address: data.fullAddress,
+        totalRooms: data.totalCapacity,
+        availableRooms: data.currentVacancy,
+        depositAmount: data.securityDeposit,
+        ownerId: data.ownerId || user?.userid,
+        images: [...(data.images || []), ...uploadedImageKeys],
+>>>>>>> Stashed changes
       };
 
       if (isEditMode) {
@@ -146,7 +238,26 @@ const RegisterPG = () => {
       setTimeout(() => navigate(user?.role === "ADMIN" ? "/admin/pgs" : "/owner/pg-list"), 1500);
     } catch (err) {
       console.error(err);
+<<<<<<< Updated upstream
       setError("Failed to register PG. Check all fields.");
+=======
+      if (err.response?.status === 400 && err.response?.data) {
+        // Map server-side errors to react-hook-form
+        const serverErrors = err.response.data;
+        Object.keys(serverErrors).forEach((key) => {
+          // Map backend error keys to frontend form keys
+          let formKey = key;
+          if (key === 'address') formKey = 'fullAddress';
+          if (key === 'totalRooms') formKey = 'totalCapacity';
+          if (key === 'availableRooms') formKey = 'currentVacancy';
+          if (key === 'depositAmount') formKey = 'securityDeposit';
+          
+          setError(formKey, { type: "server", message: serverErrors[key] });
+        });
+      } else {
+        setServerError(err.response?.data?.message || "An unexpected error occurred. Please try again.");
+      }
+>>>>>>> Stashed changes
     } finally {
       setUploadingImages(false);
       setIsSubmitting(false);
@@ -198,6 +309,7 @@ const RegisterPG = () => {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">PG Name</label>
                 <input
+<<<<<<< Updated upstream
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
@@ -205,6 +317,15 @@ const RegisterPG = () => {
                   required
                   className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
                 />
+=======
+                  {...register("pgName")}
+                  placeholder="e.g. Sunset Premium PG"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.pgName ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
+                />
+                <ErrorMsg name="pgName" />
+>>>>>>> Stashed changes
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">PG Type</label>
@@ -262,6 +383,7 @@ const RegisterPG = () => {
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Full Address</label>
                 <input
+<<<<<<< Updated upstream
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
@@ -269,6 +391,15 @@ const RegisterPG = () => {
                   required
                   className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
                 />
+=======
+                  {...register("fullAddress")}
+                  placeholder="Street, Area, Landmark"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.fullAddress ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
+                />
+                <ErrorMsg name="fullAddress" />
+>>>>>>> Stashed changes
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">City</label>
@@ -311,7 +442,9 @@ const RegisterPG = () => {
                   value={formData.landmark}
                   onChange={handleChange}
                   placeholder="Near Meto/Mall"
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.landmark ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
                 />
               </div>
               <div className="space-y-2">
@@ -357,23 +490,41 @@ const RegisterPG = () => {
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Total Capacity (Beds/Vacancies)</label>
                 <input
                   type="number"
+<<<<<<< Updated upstream
                   name="totalRooms"
                   value={formData.totalRooms}
                   onChange={handleChange}
                   required
                   className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
                 />
+=======
+                  {...register("totalCapacity")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.totalCapacity ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
+                />
+                <ErrorMsg name="totalCapacity" />
+>>>>>>> Stashed changes
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Current Vacancy</label>
                 <input
                   type="number"
+<<<<<<< Updated upstream
                   name="availableRooms"
                   value={formData.availableRooms}
                   onChange={handleChange}
                   required
                   className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
                 />
+=======
+                  {...register("currentVacancy")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.currentVacancy ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
+                />
+                <ErrorMsg name="currentVacancy" />
+>>>>>>> Stashed changes
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Price per Bed (₹)</label>
@@ -390,12 +541,21 @@ const RegisterPG = () => {
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">Security Deposit (₹)</label>
                 <input
                   type="number"
+<<<<<<< Updated upstream
                   name="depositAmount"
                   value={formData.depositAmount}
                   onChange={handleChange}
                   required
                   className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
                 />
+=======
+                  {...register("securityDeposit")}
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
+                    errors.securityDeposit ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                  }`}
+                />
+                <ErrorMsg name="securityDeposit" />
+>>>>>>> Stashed changes
               </div>
             </div>
           </div>
