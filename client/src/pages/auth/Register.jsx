@@ -66,7 +66,7 @@ const Register = () => {
         message = JSON.stringify(message);
       }
       
-      setError(message);
+      setServerError(message);
       toast.error(message);
     } finally {
       setLoading(false);

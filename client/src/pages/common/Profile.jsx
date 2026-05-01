@@ -22,6 +22,28 @@ const Profile = () => {
   const [imageUploading, setImageUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(profileSchema),
+    mode: "onBlur",
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      profilePic: "",
+      isActive: true,
+    },
+  });
+
+  const profilePic = watch("profilePic");
+  const fullName = watch("fullName");
+
 
   useEffect(() => {
     const fetchProfile = async () => {
