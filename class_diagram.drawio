@@ -1,0 +1,202 @@
+<mxfile host="Electron" modified="2024-04-12T14:00:00.000Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="PgFullProjectDiagram" version="21.6.8" type="device">
+  <diagram id="PgFullClassDiagram" name="PG Full System Class Diagram">
+    <mxGraphModel dx="2000" dy="2000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="2000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="title" value="PG Accommodation System — High Fidelity Class Diagram" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="50" y="20" width="1500" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- INFRASTRUCTURE LAYER -->
+        <mxCell id="infra_group" value="Infrastructure" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="400" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="eureka" value="&lt;b&gt;EurekaServer&lt;/b&gt;&lt;hr&gt;&lt;i&gt;Service Discovery&lt;/i&gt;&lt;hr&gt;+ main(args: String[])&lt;br&gt;+ run()" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="infra_group">
+          <mxGeometry x="20" y="50" width="160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="gateway" value="&lt;b&gt;ApiGateway&lt;/b&gt;&lt;hr&gt;&lt;i&gt;Route Orchestrator&lt;/i&gt;&lt;hr&gt;+ main(args: String[])&lt;br&gt;+ configureRoutes()" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="infra_group">
+          <mxGeometry x="220" y="50" width="160" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ENUMS LAYER -->
+        <mxCell id="enum_group" value="Global Enums" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="500" y="100" width="900" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_usertype" value="&lt;b&gt;&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&lt;br&gt;UserType&lt;/b&gt;&lt;hr&gt;ADMIN&lt;br&gt;OWNER&lt;br&gt;TENANT" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#ffffff;" vertex="1" parent="enum_group">
+          <mxGeometry x="20" y="50" width="150" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_pgtype" value="&lt;b&gt;&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&lt;br&gt;PgType&lt;/b&gt;&lt;hr&gt;MALE_ONLY&lt;br&gt;FEMALE_ONLY&lt;br&gt;UNISEX" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#ffffff;" vertex="1" parent="enum_group">
+          <mxGeometry x="190" y="50" width="150" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_sharing" value="&lt;b&gt;&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&lt;br&gt;SharingType&lt;/b&gt;&lt;hr&gt;ONE&lt;br&gt;TWO&lt;br&gt;THREE&lt;br&gt;FOUR&lt;br&gt;FOUR_PLUS" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#ffffff;" vertex="1" parent="enum_group">
+          <mxGeometry x="360" y="50" width="150" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="enum_roomstatus" value="&lt;b&gt;&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&lt;br&gt;RoomStatus&lt;/b&gt;&lt;hr&gt;AVAILABLE&lt;br&gt;OCCUPIED&lt;br&gt;MAINTENANCE" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#ffffff;" vertex="1" parent="enum_group">
+          <mxGeometry x="530" y="50" width="150" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- AUTH SERVICE -->
+        <mxCell id="service_auth" value="Auth Service" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="350" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="auth_ctrl" value="&lt;b&gt;AuthController&lt;/b&gt;&lt;hr&gt;- authService: AuthService&lt;hr&gt;+ register(RegisterRequest): String&lt;br&gt;+ login(AuthRequest): AuthResponse&lt;br&gt;+ googleLogin(GoogleAuthRequest): AuthResponse" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_auth">
+          <mxGeometry x="20" y="45" width="310" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="auth_srv" value="&lt;b&gt;AuthServiceImpl&lt;/b&gt;&lt;hr&gt;- userRepository: UserRepository&lt;br&gt;- passwordEncoder: PasswordEncoder&lt;br&gt;- jwtUtil: JwtUtil&lt;hr&gt;+ register(RegisterRequest): void&lt;br&gt;+ login(AuthRequest): AuthResponse&lt;br&gt;+ googleLogin(GoogleAuthRequest): AuthResponse" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_auth">
+          <mxGeometry x="20" y="180" width="310" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="auth_ent_user" value="&lt;b&gt;User (Entity)&lt;/b&gt;&lt;hr&gt;- userId: Integer&lt;br&gt;- username: String&lt;br&gt;- email: String&lt;br&gt;- phone: String&lt;br&gt;- fullName: String&lt;br&gt;- userType: UserType&lt;br&gt;- profilePic: String&lt;br&gt;- isActive: Boolean" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_auth">
+          <mxGeometry x="20" y="305" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- USER SERVICE -->
+        <mxCell id="service_user" value="User Service" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="350" width="1050" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="user_ctrl" value="&lt;b&gt;UserController&lt;/b&gt;&lt;hr&gt;- userService: UserService&lt;br&gt;- jwtUtil: JwtUtil&lt;hr&gt;+ registerUser(User): User&lt;br&gt;+ getUserById(Integer): User&lt;br&gt;+ getAllUsers(): List&amp;lt;User&amp;gt;&lt;br&gt;+ getUserByUsername(String): User&lt;br&gt;+ updateUser(Integer, User): User&lt;br&gt;+ deleteUser(Integer): void&lt;br&gt;+ getCurrentUser(HttpServletRequest): User" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_user">
+          <mxGeometry x="20" y="45" width="280" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="user_srv" value="&lt;b&gt;UserServiceImpl&lt;/b&gt;&lt;hr&gt;- userRepository: UserRepository&lt;br&gt;- passwordEncoder: PasswordEncoder&lt;hr&gt;+ registerUser(User): User&lt;br&gt;+ getUserById(Integer): Optional&amp;lt;User&amp;gt;&lt;br&gt;+ getAllUsers(): List&amp;lt;User&amp;gt;&lt;br&gt;+ getUserByUsername(String): Optional&amp;lt;User&amp;gt;&lt;br&gt;+ updateUser(Integer, User): User&lt;br&gt;+ deleteUser(Integer): void" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_user">
+          <mxGeometry x="20" y="200" width="280" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="user_ent_user" value="&lt;b&gt;User (Entity)&lt;/b&gt;&lt;hr&gt;- userid: Integer&lt;br&gt;- username: String&lt;br&gt;- password: String&lt;br&gt;- email: String&lt;br&gt;- phone: String&lt;br&gt;- userType: UserType&lt;br&gt;- fullName: String&lt;br&gt;- profilePic: String&lt;br&gt;- createdAt: LocalDateTime&lt;br&gt;- lastLogin: LocalDateTime&lt;br&gt;- isActive: Boolean" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_user">
+          <mxGeometry x="340" y="45" width="200" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="user_ent_notif" value="&lt;b&gt;Notification&lt;/b&gt;&lt;hr&gt;- id: Integer&lt;br&gt;- user: User&lt;br&gt;- message: String&lt;br&gt;- isRead: Boolean&lt;br&gt;- createdAt: LocalDateTime" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_user">
+          <mxGeometry x="580" y="45" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="user_ent_wish" value="&lt;b&gt;Wishlist&lt;/b&gt;&lt;hr&gt;- id: Integer&lt;br&gt;- user: User&lt;br&gt;- pgId: Integer&lt;br&gt;- createdAt: LocalDateTime" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_user">
+          <mxGeometry x="820" y="45" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="user_ent_image" value="&lt;b&gt;Image&lt;/b&gt;&lt;hr&gt;- id: String&lt;br&gt;- name: String&lt;br&gt;- type: String&lt;br&gt;- data: byte[]" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_user">
+          <mxGeometry x="580" y="170" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- PROPERTY SERVICE -->
+        <mxCell id="service_prop" value="Property Service" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="800" width="850" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="prop_ctrl" value="&lt;b&gt;PgPropertyController&lt;/b&gt;&lt;hr&gt;- pgPropertyService: PgPropertyService&lt;hr&gt;+ addPgProperty(PgProperty): PgProperty&lt;br&gt;+ getAllPgProperties(): List&amp;lt;PgProperty&amp;gt;&lt;br&gt;+ getPgByCity(String): List&amp;lt;PgProperty&amp;gt;&lt;br&gt;+ getPgById(Integer): PgProperty&lt;br&gt;+ deletePg(Integer): void&lt;br&gt;+ updatePgProperty(Integer, PgProperty): PgProperty" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_prop">
+          <mxGeometry x="20" y="50" width="350" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="prop_srv" value="&lt;b&gt;PgPropertyServiceImpl&lt;/b&gt;&lt;hr&gt;- pgPropertyRepository: PgPropertyRepository&lt;br&gt;- restTemplate: RestTemplate&lt;br&gt;- notificationClient: NotificationClient&lt;hr&gt;+ addPgProperty(PgProperty): PgProperty&lt;br&gt;+ getAllPgProperties(): List&amp;lt;PgProperty&amp;gt;&lt;br&gt;+ updatePgProperty(Integer, PgProperty): PgProperty&lt;br&gt;+ deletePgProperty(Integer): void" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_prop">
+          <mxGeometry x="20" y="200" width="350" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="prop_ent_pg" value="&lt;b&gt;PgProperty (Entity)&lt;/b&gt;&lt;hr&gt;- pgId: Integer&lt;br&gt;- ownerId: Integer&lt;br&gt;- name: String&lt;br&gt;- address: String&lt;br&gt;- city: String&lt;br&gt;- pricePerBed: BigDecimal&lt;br&gt;- depositAmount: BigDecimal&lt;br&gt;- foodIncluded: Boolean&lt;br&gt;- pgType: PgType&lt;br&gt;- images: List&amp;lt;String&amp;gt;&lt;br&gt;- rating: BigDecimal" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_prop">
+          <mxGeometry x="420" y="50" width="220" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="prop_ent_room" value="&lt;b&gt;Room&lt;/b&gt;&lt;hr&gt;- roomId: Integer&lt;br&gt;- pgId: Integer&lt;br&gt;- roomNumber: String&lt;br&gt;- sharingType: SharingType&lt;br&gt;- bedsAvailable: Integer&lt;br&gt;- rentAmount: BigDecimal&lt;br&gt;- status: RoomStatus" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_prop">
+          <mxGeometry x="670" y="50" width="160" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="prop_ent_amen" value="&lt;b&gt;Amenity&lt;/b&gt;&lt;hr&gt;- amenityId: Integer&lt;br&gt;- pgProperty: PgProperty&lt;br&gt;- name: String&lt;br&gt;- isAvailable: Boolean" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_prop">
+          <mxGeometry x="670" y="200" width="160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="prop_ent_rev" value="&lt;b&gt;Review&lt;/b&gt;&lt;hr&gt;- id: Integer&lt;br&gt;- pgProperty: PgProperty&lt;br&gt;- userId: Integer&lt;br&gt;- userName: String&lt;br&gt;- rating: Integer&lt;br&gt;- comment: String" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_prop">
+          <mxGeometry x="670" y="310" width="160" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- BOOKING SERVICE -->
+        <mxCell id="service_book" value="Booking Service" style="swimlane;whiteSpace=wrap;html=1;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="950" y="800" width="550" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="book_ctrl" value="&lt;b&gt;BookingController&lt;/b&gt;&lt;hr&gt;- bookingService: BookingService&lt;hr&gt;+ createBooking(Booking): Booking&lt;br&gt;+ getAllBookings(): List&amp;lt;Booking&amp;gt;&lt;br&gt;+ updateStatus(Integer, String): void&lt;br&gt;+ cancelBooking(Integer): void" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_book">
+          <mxGeometry x="20" y="50" width="250" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="book_srv" value="&lt;b&gt;BookingServiceImpl&lt;/b&gt;&lt;hr&gt;- bookingRepo: BookingRepository&lt;br&gt;- restTemplate: RestTemplate&lt;hr&gt;+ createBooking(Booking): Booking&lt;br&gt;+ getBookingsWithUserInfoByPgId(...): List" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_book">
+          <mxGeometry x="20" y="170" width="250" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="book_ent_book" value="&lt;b&gt;Booking (Entity)&lt;/b&gt;&lt;hr&gt;- id: Integer&lt;br&gt;- userId: Integer&lt;br&gt;- pgId: Integer&lt;br&gt;- startDate: LocalDateTime&lt;br&gt;- status: String&lt;br&gt;- amount: Double" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_book">
+          <mxGeometry x="320" y="50" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="book_ent_pay" value="&lt;b&gt;Payment (Entity)&lt;/b&gt;&lt;hr&gt;- id: Integer&lt;br&gt;- userId: Integer&lt;br&gt;- pgId: Integer&lt;br&gt;- amount: Double&lt;br&gt;- razorpayPaymentId: String&lt;br&gt;- status: String" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;fillColor=#ffffff;" vertex="1" parent="service_book">
+          <mxGeometry x="320" y="200" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- EDGES & CARDINALITIES -->
+        <!-- User -> Wishlist -->
+        <mxCell id="e_user_wish" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;endArrow=classic;endFill=1;" edge="1" parent="1" source="user_ent_user" target="user_ent_wish">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="475" />
+              <mxPoint x="780" y="445" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_user_wish_lbl" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_user_wish">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <mxPoint x="10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- User -> Notification -->
+        <mxCell id="e_user_notif" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.25;entryX=0;entryY=0.5;endArrow=classic;endFill=1;" edge="1" parent="1" source="user_ent_user" target="user_ent_notif">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_notif_lbl" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_user_notif">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <mxPoint x="5" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Property -> Room -->
+        <mxCell id="e_pg_room" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.25;entryX=0;entryY=0.5;endArrow=diamond;endFill=1;" edge="1" parent="1" source="prop_ent_pg" target="prop_ent_room">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pg_room_lbl" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_pg_room">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Property -> Amenity -->
+        <mxCell id="e_pg_amen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;endArrow=diamond;endFill=1;" edge="1" parent="1" source="prop_ent_pg" target="prop_ent_amen">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pg_amen_lbl" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_pg_amen">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Property -> Review -->
+        <mxCell id="e_pg_rev" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.75;entryX=0;entryY=0.5;endArrow=diamond;endFill=1;" edge="1" parent="1" source="prop_ent_pg" target="prop_ent_rev">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pg_rev_lbl" value="1..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_pg_rev">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Booking -> Payment -->
+        <mxCell id="e_book_pay" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="book_ent_book" target="book_ent_pay">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_book_pay_lbl" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="e_book_pay">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- LOGICAL CROSS-SERVICE LINK (Booking -> User) -->
+        <mxCell id="e_book_user_cross" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;dashed=1;endArrow=classic;strokeColor=#FF0000;" edge="1" parent="1" source="book_ent_book" target="user_ent_user">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1370" y="780" />
+              <mxPoint x="550" y="780" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_book_user_cross_lbl" value="Logical User Reference (HTTP)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FF0000;" vertex="1" connectable="0" parent="e_book_user_cross">
+          <mxGeometry x="-0.4" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

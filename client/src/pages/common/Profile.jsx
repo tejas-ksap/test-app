@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { profileSchema } from "../../utils/validation";
 import { 
   PiUser, 
   PiEnvelope, 
@@ -15,13 +18,6 @@ import {
 
 const Profile = () => {
   const { user, login, token } = useAuth();
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    profilePic: "",
-    isActive: true
-  });
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -31,7 +27,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/api/users/me");
-        setFormData({
+        reset({
           fullName: res.data.fullName || "",
           email: res.data.email || "",
           phone: res.data.phone || "",
@@ -45,11 +41,7 @@ const Profile = () => {
       }
     };
     fetchProfile();
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  }, [reset]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -64,10 +56,18 @@ const Profile = () => {
       const uploadRes = await api.post("/api/users/images/upload", uploadData);
       const imageId = uploadRes.data.imageKey;
       
-      setFormData(prev => ({ ...prev, profilePic: imageId }));
+      setValue("profilePic", imageId);
       
-      const putData = { ...formData, profilePic: imageId };
-      const saveRes = await api.put("/api/users/me", putData);
+      // Get current form values to save
+      const currentValues = { 
+        fullName: watch("fullName"),
+        email: watch("email"),
+        phone: watch("phone"),
+        profilePic: imageId,
+        isActive: watch("isActive")
+      };
+      
+      const saveRes = await api.put("/api/users/me", currentValues);
       login(token, saveRes.data);
       return saveRes;
     })();
@@ -87,11 +87,10 @@ const Profile = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setLoading(true);
 
-    const updatePromise = api.put("/api/users/me", formData);
+    const updatePromise = api.put("/api/users/me", data);
 
     toast.promise(updatePromise, {
       pending: "Saving your profile changes...",
@@ -117,6 +116,14 @@ const Profile = () => {
     if (!pic) return null;
     if (pic.startsWith('http')) return pic;
     return `${api.defaults.baseURL || "http://localhost:8085"}/api/users/images/${pic}`;
+  };
+
+  const ErrorMsg = ({ name }) => {
+    return errors[name] ? (
+      <p className="text-red-500 text-[10px] mt-1 font-bold animate-in fade-in slide-in-from-top-1">
+        {errors[name].message}
+      </p>
+    ) : null;
   };
 
   if (fetching) {
@@ -158,9 +165,9 @@ const Profile = () => {
               <div className="relative group/avatar cursor-pointer mb-8">
                 <div className="w-40 h-40 rounded-[2.5rem] bg-gradient-to-br from-[#5A45FF] to-[#8E7DFF] p-1.5 shadow-2xl shadow-[#5A45FF]/30 transition-transform duration-500 group-hover/avatar:scale-105 group-hover/avatar:rotate-2">
                   <div className="w-full h-full rounded-[2.2rem] overflow-hidden bg-white dark:bg-gray-900 relative">
-                    {formData.profilePic ? (
+                    {profilePic ? (
                       <img 
-                        src={getImageUrl(formData.profilePic)} 
+                        src={getImageUrl(profilePic)} 
                         alt="Profile" 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover/avatar:scale-110" 
                       />
@@ -185,7 +192,7 @@ const Profile = () => {
               </div>
 
               <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight px-4 line-clamp-1">
-                {formData.fullName || "Your Name"}
+                {fullName || "Your Name"}
               </h2>
               <p className="text-[#5A45FF] dark:text-[#8E7DFF] font-black uppercase text-[10px] tracking-[0.2em] mt-2 bg-[#5A45FF]/10 dark:bg-[#5A45FF]/20 px-4 py-1.5 rounded-full border border-[#5A45FF]/10">
                 {user?.userType || "User Account"}
@@ -215,7 +222,7 @@ const Profile = () => {
               <p className="text-gray-400 font-medium mt-1">Configure your public information and identity.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Full Name */}
                 <div className="space-y-3">
@@ -226,13 +233,13 @@ const Profile = () => {
                   <div className="relative group">
                     <input
                       type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50 transition-all outline-none"
+                      {...register("fullName")}
+                      className={`w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 transition-all outline-none ${
+                        errors.fullName ? "border-red-500 focus:ring-red-500/10 focus:border-red-500/50" : "border-gray-100 dark:border-gray-800 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50"
+                      }`}
                       placeholder="e.g. John Wick"
                     />
+                    <ErrorMsg name="fullName" />
                   </div>
                 </div>
 
@@ -245,13 +252,13 @@ const Profile = () => {
                   <div className="relative group">
                     <input
                       type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50 transition-all outline-none"
-                      placeholder="+1 234 567 890"
+                      {...register("phone")}
+                      className={`w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 transition-all outline-none ${
+                        errors.phone ? "border-red-500 focus:ring-red-500/10 focus:border-red-500/50" : "border-gray-100 dark:border-gray-800 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50"
+                      }`}
+                      placeholder="1234567890"
                     />
+                    <ErrorMsg name="phone" />
                   </div>
                 </div>
 
@@ -264,13 +271,13 @@ const Profile = () => {
                   <div className="relative group">
                     <input
                       type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50 transition-all outline-none shadow-inner"
+                      {...register("email")}
+                      className={`w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 transition-all outline-none shadow-inner ${
+                        errors.email ? "border-red-500 focus:ring-red-500/10 focus:border-red-500/50" : "border-gray-100 dark:border-gray-800 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50"
+                      }`}
                       placeholder="name@company.com"
                     />
+                    <ErrorMsg name="email" />
                   </div>
                 </div>
               </div>
