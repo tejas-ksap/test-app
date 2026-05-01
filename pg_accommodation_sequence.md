@@ -95,6 +95,52 @@ sequenceDiagram
     end
 ```
 
+---
+
+## 4. Password Reset Flow
+This flow handles the process of generating a reset token and updating the user's password.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Client as React Dashboard
+    participant Gateway as API Gateway (8085)
+    participant Auth as Auth Service (8081)
+    participant DB as MySQL (pg_accommodation)
+
+    Note over User, Client: Forgot Password Step
+    User->>Client: Enter Email/Username
+    Client->>Gateway: POST /api/auth/forgot-password
+    Gateway->>Auth: Forward Request
+    Auth->>DB: Check User Existence
+    DB-->>Auth: User Entity
+    Auth->>Auth: Generate 8-char Reset Token
+    Auth->>DB: Save Token (password_reset_tokens)
+    Auth-->>Gateway: 200 OK (Token in message for dev)
+    Gateway-->>Client: 200 OK (Token)
+    Client-->>User: Display Token / Success Message
+
+    Note over User, Client: Reset Password Step
+    User->>Client: Enter Token & New Password
+    Client->>Gateway: POST /api/auth/reset-password
+    Gateway->>Auth: Forward Request
+    Auth->>DB: Validate Token
+    DB-->>Auth: Token valid?
+    alt Token Valid
+        Auth->>Auth: Hash New Password
+        Auth->>DB: Update User Password
+        Auth->>DB: Delete/Invalidate Token
+        Auth-->>Gateway: 200 OK (Success)
+        Gateway-->>Client: 200 OK
+        Client-->>User: Redirect to Login
+    else Token Invalid/Expired
+        Auth-->>Gateway: 400 Bad Request
+        Gateway-->>Client: 400 Bad Request
+        Client-->>User: Show Error "Invalid Token"
+    end
+```
+
+
 ## Description of Interactions
 
 - **Shared Database**: In this architecture, while services are separate, they currently share a single MySQL schema (`pg_accommodation`) for core data like `PgProperty`, which allows the `Booking Service` to perform availability checks and updates efficiently.

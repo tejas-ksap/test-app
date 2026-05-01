@@ -8,14 +8,12 @@ const TenantDashboard = () => {
   const [payments, setPayments] = useState([]);
   const [ownerInfo, setOwnerInfo] = useState(null);
   const [upcomingRent, setUpcomingRent] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!user?.userid) return;
       
       try {
-        setLoading(true);
         
         // 1. Fetch payments
         const paymentRes = await api.get(`/api/payments/user/${user.userid}`);
@@ -37,7 +35,7 @@ const TenantDashboard = () => {
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
       } finally {
-        setLoading(false);
+        // Data fetch complete
       }
     };
 

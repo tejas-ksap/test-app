@@ -53,7 +53,10 @@ const Login = () => {
       else navigate("/");
     } catch (err) {
       console.error(err);
-      const message = err.response?.data?.message || err.response?.data || "Login failed. Please check your credentials.";
+      let message = err.response?.data?.message || err.response?.data || "Login failed. Please check your credentials.";
+      if (typeof message === "object") {
+        message = message.message || message.error || "An error occurred";
+      }
       setError(message);
       toast.error(message);
     }
@@ -95,7 +98,10 @@ const Login = () => {
         else navigate("/");
       } catch (err) {
         console.error("Google login error:", err);
-        const message = err.response?.data?.message || err.response?.data || "Google sign-in failed. Please try again.";
+        let message = err.response?.data?.message || err.response?.data || "Google sign-in failed. Please try again.";
+        if (typeof message === "object") {
+          message = message.message || message.error || "An error occurred";
+        }
         setError(message);
         toast.error(message);
       } finally {
@@ -187,9 +193,9 @@ const Login = () => {
             </label>
           </div>
 
-          <a href="#" className="text-sm font-medium text-[#5A45FF] hover:text-[#4633e6] transition-colors">
+          <Link to="/forgot-password" title="Forgot password?" className="text-sm font-medium text-[#5A45FF] hover:text-[#4633e6] transition-colors">
             Forgot password?
-          </a>
+          </Link>
         </div>
 
         <div className="pt-2">

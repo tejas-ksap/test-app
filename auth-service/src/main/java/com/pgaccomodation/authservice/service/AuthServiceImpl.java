@@ -18,8 +18,10 @@ import lombok.RequiredArgsConstructor;
 public class AuthServiceImpl implements AuthService {
 
 	private final UserRepository userRepository;
+	private final com.pgaccomodation.authservice.repository.PasswordResetTokenRepository tokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
+	private final EmailService emailService;
 
 	@Override
 	public void register(RegisterRequest request) {
@@ -83,5 +85,57 @@ public class AuthServiceImpl implements AuthService {
 
 		String token = jwtUtil.generateToken(user);
 		return new AuthResponse(token, "Google login successful");
+	}
+
+	@Override
+	@org.springframework.transaction.annotation.Transactional
+	public String forgotPassword(com.pgaccomodation.authservice.dto.ForgotPasswordRequest request) {
+		User user = userRepository.findByUsernameOrEmail(request.getIdentifier(), request.getIdentifier())
+				.orElseThrow(() -> new RuntimeException("User not found with identifier: " + request.getIdentifier()));
+
+		// Delete existing tokens for this user if any
+		tokenRepository.findByUser(user).ifPresent(t -> {
+			tokenRepository.delete(t);
+			tokenRepository.flush();
+		});
+
+		String token = java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase(); // Short token for demo
+		com.pgaccomodation.authservice.entity.PasswordResetToken resetToken = com.pgaccomodation.authservice.entity.PasswordResetToken.builder()
+				.token(token)
+				.user(user)
+				.expiryDate(java.time.LocalDateTime.now().plusMinutes(15)) // 15 mins expiry
+				.build();
+
+		tokenRepository.save(resetToken);
+
+		// Send the token via email
+		emailService.sendResetToken(user.getEmail(), token);
+
+		// For development/testing, we still log it.
+		System.out.println("DEBUG: Password reset token for " + user.getEmail() + " is: " + token);
+		return token;
+	}
+
+	@Override
+	@org.springframework.transaction.annotation.Transactional
+	public void resetPassword(com.pgaccomodation.authservice.dto.ResetPasswordRequest request) {
+		if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+			throw new com.pgaccomodation.authservice.exception.FieldValidationException("confirmPassword", "Passwords do not match");
+		}
+
+		com.pgaccomodation.authservice.entity.PasswordResetToken resetToken = tokenRepository.findByToken(request.getToken())
+				.orElseThrow(() -> new RuntimeException("Invalid or expired token"));
+
+		if (resetToken.isExpired()) {
+			tokenRepository.delete(resetToken);
+			throw new RuntimeException("Token has expired");
+		}
+
+		User user = resetToken.getUser();
+		user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		userRepository.save(user);
+
+		// Delete token after successful reset
+		tokenRepository.delete(resetToken);
 	}
 }

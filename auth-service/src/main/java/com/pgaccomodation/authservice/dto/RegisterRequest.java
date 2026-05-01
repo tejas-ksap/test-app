@@ -13,10 +13,10 @@ import lombok.Data;
 public class RegisterRequest {
 	
 	@NotBlank(message = "Full name is required")
+	@Pattern(regexp = "^[A-Za-z ]+$", message = "Only alphabets are allowed in full name")
 	private String fullName;
 
 	@NotBlank(message = "Username is required")
-	@Size(min = 3, message = "Username must be at least 3 characters")
 	private String username;
 
 	@NotBlank(message = "Email is required")
@@ -24,9 +24,6 @@ public class RegisterRequest {
 	private String email;
 
 	@NotBlank(message = "Password is required")
-	@Size(min = 8, message = "Password must be at least 8 characters")
-	@Pattern(regexp = "^(?=.*[A-Z]).*$", message = "Password must contain at least one uppercase letter")
-	@Pattern(regexp = "^(?=.*[@$!%*?&]).*$", message = "Password must contain at least one special character")
 	private String password;
 
 	@NotBlank(message = "Confirm Password is required")

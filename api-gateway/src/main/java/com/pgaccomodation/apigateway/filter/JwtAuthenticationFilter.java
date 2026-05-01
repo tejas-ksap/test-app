@@ -25,6 +25,8 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/google",
+            "/api/auth/forgot-password",
+            "/api/auth/reset-password",
             "/api/pg-properties",
             "/api/users/images"
     );

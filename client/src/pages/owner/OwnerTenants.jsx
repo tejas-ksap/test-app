@@ -50,7 +50,7 @@ const OwnerTenants = () => {
     return Math.round(diffDays / 30.44);
   };
 
-  const fetchTenants = async () => {
+  const fetchTenants = React.useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -105,11 +105,11 @@ const OwnerTenants = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     if (user) fetchTenants();
-  }, [user]);
+  }, [user, fetchTenants]);
 
   useEffect(() => {
     const statusMap = {};
@@ -121,7 +121,7 @@ const OwnerTenants = () => {
 
   const handleUpdateStatus = async (bookingId, newStatus) => {
     try {
-      const res = await api.put(`/api/bookings/${bookingId}/status?status=${newStatus}`);
+      await api.put(`/api/bookings/${bookingId}/status?status=${newStatus}`);
       toast.success("Status updated successfully");
       setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
     } catch (err) {
@@ -141,6 +141,7 @@ const OwnerTenants = () => {
     );
   });
 
+/*
   const getStatusColor = (status) => {
     switch (status?.toUpperCase()) {
       case "CONFIRMED": return "bg-emerald-50 text-emerald-700 border-emerald-100";
@@ -158,6 +159,7 @@ const OwnerTenants = () => {
       default: return <PiClock className="text-lg" />;
     }
   };
+*/
 
   if (loading && bookings.length === 0) {
     return (

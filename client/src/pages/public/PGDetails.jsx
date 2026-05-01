@@ -153,7 +153,6 @@ const PgDetails = () => {
   }
 
   const price = pg.pricePerBed?.parsedValue ?? pg.pricePerBed;
-  const deposit = pg.depositAmount?.parsedValue ?? pg.depositAmount;
   const typeStr = pg.pgType === "MALE_ONLY" ? "Male Only" : pg.pgType === "FEMALE_ONLY" ? "Female Only" : "Unisex";
 
   return (

@@ -9,4 +9,6 @@ public interface AuthService {
     AuthResponse login(AuthRequest request);
     void register(RegisterRequest request);
     AuthResponse googleLogin(GoogleAuthRequest request);
+    String forgotPassword(com.pgaccomodation.authservice.dto.ForgotPasswordRequest request);
+    void resetPassword(com.pgaccomodation.authservice.dto.ResetPasswordRequest request);
 }

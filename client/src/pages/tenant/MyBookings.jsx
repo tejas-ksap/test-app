@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import { PiMapPin, PiCurrencyInr, PiCalendarBlank, PiChecksBold, PiXBold, PiCalendarSlash } from "react-icons/pi";
+import { PiMapPin, PiCurrencyInr, PiCalendarBlank, PiXBold, PiCalendarSlash } from "react-icons/pi";
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -11,7 +11,7 @@ const MyBookings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const fetchBookings = async () => {
+  const fetchBookings = React.useCallback(async () => {
     try {
       const res = await api.get(`/api/bookings/user/${user.userid || user.id}/full`);
       setBookings(res.data);
@@ -20,7 +20,7 @@ const MyBookings = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   const handleCancel = async (bookingId) => {
     try {
@@ -34,7 +34,7 @@ const MyBookings = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [fetchBookings]);
 
   const statusColor = status => {
     if (status === "CONFIRMED" || status === "APPROVED") return "text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30";

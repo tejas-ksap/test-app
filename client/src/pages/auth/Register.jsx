@@ -53,9 +53,17 @@ const Register = () => {
       
       if (typeof data === "object" && data !== null) {
         // Handle validation errors map from backend if any
-        message = Object.values(data).join(", ");
+        if (data.message) {
+          message = data.message;
+        } else {
+          message = Object.values(data).join(", ");
+        }
       } else if (typeof data === "string") {
         message = data;
+      }
+      
+      if (typeof message === "object") {
+        message = JSON.stringify(message);
       }
       
       setServerError(message);

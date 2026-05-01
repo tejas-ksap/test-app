@@ -31,7 +31,7 @@ const Profile = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(profileSchema),
-    mode: "all",
+    mode: "onBlur",
     defaultValues: {
       displayName: "",
       email: "",
@@ -43,6 +43,7 @@ const Profile = () => {
 
   const profilePic = watch("profilePic");
   const displayName = watch("displayName");
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -121,14 +122,18 @@ const Profile = () => {
     toast.promise(updatePromise, {
       pending: "Saving your profile changes...",
       success: "Profile updated successfully! 👌",
-      error: "Failed to update profile. Please try again. 🤯"
+      error: "Failed to update profile. Please check the fields. 🤯"
     });
 
     try {
       const res = await updatePromise;
       login(token, res.data); // Update AuthContext user state
-    } catch {
-      // Error is handled by toast.promise
+    } catch (err) {
+      if (err.response && err.response.status === 400 && err.response.data) {
+        Object.keys(err.response.data).forEach((field) => {
+          toast.error(`${field}: ${err.response.data[field]}`);
+        });
+      }
     } finally {
       setLoading(false);
     }
