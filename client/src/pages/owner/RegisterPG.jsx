@@ -94,7 +94,7 @@ const RegisterPG = () => {
       };
       fetchProperty();
     }
-  }, [id, isEditMode, reset]);
+  }, [id, isEditMode, reset, user?.userid]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
