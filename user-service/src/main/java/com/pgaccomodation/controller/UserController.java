@@ -19,8 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pgaccomodation.entity.User;
 import com.pgaccomodation.service.UserService;
 import com.pgaccomodation.util.JwtUtil;
+import com.pgaccomodation.dto.EditProfileRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -95,12 +101,21 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/me")
-    public ResponseEntity<User> updateCurrentUser(HttpServletRequest request, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateCurrentUser(HttpServletRequest request, @Valid @RequestBody EditProfileRequest profileRequest, BindingResult result) {
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : result.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         String username = jwtUtil.extractUsername(token);
         return userService.getUserByUsername(username)
                 .map(currentUser -> {
-                    User user = userService.updateUser(currentUser.getUserid(), updatedUser);
+                    currentUser.setFullName(profileRequest.getDisplayName());
+                    User user = userService.updateUser(currentUser.getUserid(), currentUser);
                     return ResponseEntity.ok(user);
                 })
                 .orElse(ResponseEntity.notFound().build());

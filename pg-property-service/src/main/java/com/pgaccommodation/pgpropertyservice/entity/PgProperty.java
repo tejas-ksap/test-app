@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pgaccommodation.pgpropertyservice.validation.NotOnlyDigits;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +20,8 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,22 +42,37 @@ public class PgProperty {
 
 	private Integer ownerId;
 
-	@NotBlank(message = "Name is required")
+	@NotBlank(message = "PG name is required")
+	@NotOnlyDigits(message = "PG name cannot be only numbers")
+	@Pattern(
+			regexp = "^(?=(?:.*[A-Za-z]){10,})(?=.*[A-Za-z])[A-Za-z0-9 ]+$",
+			message = "PG name must contain at least 10 alphabets"
+	)
 	private String name;
 
 	@NotBlank(message = "Address is required")
+	@Pattern(regexp = "^(?=.*[A-Za-z])[A-Za-z0-9 ,./#-]+$", message = "Address must contain at least one alphabet")
+	@NotOnlyDigits(message = "Address cannot be only numbers")
 	@Column(columnDefinition = "TEXT")
 	private String address;
 
 	@NotBlank(message = "City is required")
+	@Pattern(regexp = "^[A-Za-z ]+$", message = "City must contain only alphabets")
 	private String city;
 
 	@NotBlank(message = "State is required")
+	@Pattern(regexp = "^[A-Za-z ]+$", message = "State must contain only alphabets")
 	private String state;
 
 	@NotBlank(message = "Pincode is required")
 	private String pincode;
 
+	@NotBlank(message = "Landmark is required")
+	@NotOnlyDigits(message = "Landmark cannot be only numbers")
+	@Pattern(
+			regexp = "^(?=(?:.*[A-Za-z]){10,})[A-Za-z0-9 ,./#-]+$",
+			message = "Landmark must contain at least 10 alphabets"
+	)
 	private String landmark;
 
 	@NotNull(message = "Latitude is required")
@@ -67,6 +85,12 @@ public class PgProperty {
 	@DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
 	private Double longitude;
 
+	@NotBlank(message = "Description is required")
+	@NotOnlyDigits(message = "Description cannot be only numbers")
+	@Pattern(
+			regexp = "^(?=(?:.*[A-Za-z]){50,}).+$",
+			message = "Description must contain at least 50 alphabets"
+	)
 	@Column(columnDefinition = "TEXT")
 	private String description;
 

@@ -299,7 +299,7 @@ const RegisterPG = () => {
                 <input
                   {...register("landmark")}
                   placeholder="Near Meto/Mall"
-                  className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5A45FF]/50 transition appearance-none"
+                  className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50`}
                 />
                 <ErrorMsg name="landmark" />
               </div>
