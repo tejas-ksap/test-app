@@ -24,7 +24,7 @@ const RegisterPG = () => {
     resolver: zodResolver(pgSchema),
     mode: "all",
     defaultValues: {
-      name: "",
+      pgName: "",
       address: "",
       city: "",
       state: "",
@@ -62,7 +62,7 @@ const RegisterPG = () => {
         try {
           const res = await api.get(`/api/pg-properties/${id}`);
           reset({
-            name: res.data.name || "",
+            pgName: res.data.name || res.data.pgName || "",
             address: res.data.address || "",
             city: res.data.city || "",
             state: res.data.state || "",
@@ -118,6 +118,7 @@ const RegisterPG = () => {
 
       const payload = {
         ...data,
+        name: data.pgName, // Map pgName back to name for backend
         ownerId: data.ownerId || user?.userid,
         images: [...(data.images || []), ...uploadedImageKeys],
       };
@@ -188,13 +189,13 @@ const RegisterPG = () => {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">PG Name</label>
                 <input
-                  {...register("name")}
+                  {...register("pgName")}
                   placeholder="e.g. Sunset Premium PG"
                   className={`w-full px-5 py-4 bg-gray-50 dark:bg-gray-800/50 border rounded-2xl text-gray-900 dark:text-white focus:ring-2 transition appearance-none ${
-                    errors.name ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
+                    errors.pgName ? "border-red-500 focus:ring-red-500/20" : "border-gray-100 dark:border-gray-700 focus:ring-[#5A45FF]/50"
                   }`}
                 />
-                <ErrorMsg name="name" />
+                <ErrorMsg name="pgName" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest ml-1">PG Type</label>

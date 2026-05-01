@@ -33,7 +33,7 @@ const Profile = () => {
     resolver: zodResolver(profileSchema),
     mode: "all",
     defaultValues: {
-      fullName: "",
+      displayName: "",
       email: "",
       phone: "",
       profilePic: "",
@@ -42,14 +42,14 @@ const Profile = () => {
   });
 
   const profilePic = watch("profilePic");
-  const fullName = watch("fullName");
+  const displayName = watch("displayName");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/api/users/me");
         reset({
-          fullName: res.data.fullName || "",
+          displayName: res.data.fullName || res.data.displayName || "",
           email: res.data.email || "",
           phone: res.data.phone || "",
           profilePic: res.data.profilePic || "",
@@ -81,14 +81,17 @@ const Profile = () => {
       
       // Get current form values to save
       const currentValues = { 
-        fullName: watch("fullName"),
+        displayName: watch("displayName"),
         email: watch("email"),
         phone: watch("phone"),
         profilePic: imageId,
         isActive: watch("isActive")
       };
       
-      const saveRes = await api.put("/api/users/me", currentValues);
+      // Map displayName back to fullName for backend if needed
+      const payload = { ...currentValues, fullName: currentValues.displayName };
+      
+      const saveRes = await api.put("/api/users/me", payload);
       login(token, saveRes.data);
       return saveRes;
     })();
@@ -111,7 +114,9 @@ const Profile = () => {
   const onSubmit = async (data) => {
     setLoading(true);
 
-    const updatePromise = api.put("/api/users/me", data);
+    // Map displayName back to fullName for backend compatibility
+    const payload = { ...data, fullName: data.displayName };
+    const updatePromise = api.put("/api/users/me", payload);
 
     toast.promise(updatePromise, {
       pending: "Saving your profile changes...",
@@ -209,7 +214,7 @@ const Profile = () => {
               </div>
 
               <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight px-4 line-clamp-1">
-                {fullName || "Your Name"}
+                {displayName || "Your Name"}
               </h2>
               <p className="text-[#5A45FF] dark:text-[#8E7DFF] font-black uppercase text-[10px] tracking-[0.2em] mt-2 bg-[#5A45FF]/10 dark:bg-[#5A45FF]/20 px-4 py-1.5 rounded-full border border-[#5A45FF]/10">
                 {user?.userType || "User Account"}
@@ -250,13 +255,13 @@ const Profile = () => {
                   <div className="relative group">
                     <input
                       type="text"
-                      {...register("fullName")}
+                      {...register("displayName")}
                       className={`w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 transition-all outline-none ${
-                        errors.fullName ? "border-red-500 focus:ring-red-500/10 focus:border-red-500/50" : "border-gray-100 dark:border-gray-800 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50"
+                        errors.displayName ? "border-red-500 focus:ring-red-500/10 focus:border-red-500/50" : "border-gray-100 dark:border-gray-800 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50"
                       }`}
                       placeholder="e.g. John Wick"
                     />
-                    <ErrorMsg name="fullName" />
+                    <ErrorMsg name="displayName" />
                   </div>
                 </div>
 
