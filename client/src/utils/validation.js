@@ -73,8 +73,7 @@ export const loginSchema = z.object({
   identifier: z.string().min(1, "Username or email is required"),
   password: z.string().min(1, "Password is required"),
 });
-<<<<<<< Updated upstream
-=======
+
 
 export const forgotPasswordSchema = z.object({
   identifier: z.string().min(1, "Username or email is required"),
@@ -172,4 +171,4 @@ export const pgRegistrationSchema = z.object({
   message: "Vacancy cannot exceed total capacity",
   path: ["currentVacancy"]
 });
->>>>>>> Stashed changes
+
