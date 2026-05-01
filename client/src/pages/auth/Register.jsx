@@ -54,11 +54,6 @@ const Register = () => {
       const data = err.response?.data;
       let message = "Registration failed";
       
-<<<<<<< Updated upstream
-      if (typeof data === "object") {
-        // Handle validation errors map
-        message = Object.values(data).join(", ");
-=======
       if (typeof data === "object" && data !== null) {
         // Handle validation errors map from backend if any
         if (data.message) {
@@ -66,20 +61,15 @@ const Register = () => {
         } else {
           message = Object.values(data).join(", ");
         }
->>>>>>> Stashed changes
       } else if (typeof data === "string") {
         message = data;
       }
       
-<<<<<<< Updated upstream
-      setError(message);
-=======
       if (typeof message === "object") {
         message = JSON.stringify(message);
       }
       
-      setServerError(message);
->>>>>>> Stashed changes
+      setError(message);
       toast.error(message);
     } finally {
       setLoading(false);

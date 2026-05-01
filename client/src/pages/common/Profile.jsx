@@ -26,43 +26,13 @@ const Profile = () => {
   const [imageUploading, setImageUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-<<<<<<< Updated upstream
-=======
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    setError,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(profileSchema),
-    mode: "all",
-    defaultValues: {
-      displayName: "",
-      email: "",
-      phone: "",
-      profilePic: "",
-      isActive: true,
-    },
-  });
 
-  const profilePic = watch("profilePic");
-  const displayName = watch("displayName");
-
->>>>>>> Stashed changes
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/api/users/me");
-<<<<<<< Updated upstream
         setFormData({
           fullName: res.data.fullName || "",
-=======
-        reset({
-          displayName: res.data.fullName || "",
->>>>>>> Stashed changes
           email: res.data.email || "",
           phone: res.data.phone || "",
           profilePic: res.data.profilePic || "",
@@ -96,21 +66,8 @@ const Profile = () => {
       
       setFormData(prev => ({ ...prev, profilePic: imageId }));
       
-<<<<<<< Updated upstream
       const putData = { ...formData, profilePic: imageId };
       const saveRes = await api.put("/api/users/me", putData);
-=======
-      // Get current form values to save
-      const currentValues = { 
-        displayName: watch("displayName"),
-        email: watch("email"),
-        phone: watch("phone"),
-        profilePic: imageId,
-        isActive: watch("isActive")
-      };
-      
-      const saveRes = await api.put("/api/users/me", currentValues);
->>>>>>> Stashed changes
       login(token, saveRes.data);
       return saveRes;
     })();
@@ -148,10 +105,7 @@ const Profile = () => {
     } catch (err) {
       if (err.response && err.response.status === 400 && err.response.data) {
         Object.keys(err.response.data).forEach((field) => {
-          setError(field, {
-            type: "server",
-            message: err.response.data[field],
-          });
+          toast.error(`${field}: ${err.response.data[field]}`);
         });
       }
     } finally {
@@ -231,11 +185,7 @@ const Profile = () => {
               </div>
 
               <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight px-4 line-clamp-1">
-<<<<<<< Updated upstream
                 {formData.fullName || "Your Name"}
-=======
-                {displayName || "Your Name"}
->>>>>>> Stashed changes
               </h2>
               <p className="text-[#5A45FF] dark:text-[#8E7DFF] font-black uppercase text-[10px] tracking-[0.2em] mt-2 bg-[#5A45FF]/10 dark:bg-[#5A45FF]/20 px-4 py-1.5 rounded-full border border-[#5A45FF]/10">
                 {user?.userType || "User Account"}
@@ -276,7 +226,6 @@ const Profile = () => {
                   <div className="relative group">
                     <input
                       type="text"
-<<<<<<< Updated upstream
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
@@ -284,15 +233,6 @@ const Profile = () => {
                       className="w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50 transition-all outline-none"
                       placeholder="e.g. John Wick"
                     />
-=======
-                      {...register("displayName")}
-                      className={`w-full pl-6 pr-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border rounded-2xl text-gray-900 dark:text-white font-bold focus:ring-4 transition-all outline-none ${
-                        errors.displayName ? "border-red-500 focus:ring-red-500/10 focus:border-red-500/50" : "border-gray-100 dark:border-gray-800 focus:ring-[#5A45FF]/10 focus:border-[#5A45FF]/50"
-                      }`}
-                      placeholder="e.g. John Wick"
-                    />
-                    <ErrorMsg name="displayName" />
->>>>>>> Stashed changes
                   </div>
                 </div>
 
